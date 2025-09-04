@@ -308,24 +308,24 @@ namespace FF7Scarlet.Shared.Controls
             return SetSlotInner(slot, value, GrowthRate, false, false);
         }
 
-        private bool SetSlotInner(int slot, MateriaSlot value, GrowthRate rate, bool ignoreLeft, bool ignoreRight,
+        private bool SetSlotInner(int slotIndex, MateriaSlot value, GrowthRate rate, bool ignoreLeft, bool ignoreRight,
             bool forceUpdate = false)
         {
-            if (slot >= 0 && slot < SLOT_COUNT)
+            if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
                 var newValue = GetMatchingSlot(rate, value);
-                if (slots[slot] != newValue || forceUpdate)
+                if (slots[slotIndex] != newValue || forceUpdate)
                 {
                     //update slot value
-                    var currentValue = GetMatchingSlot(rate, slots[slot]);
-                    var pb = pictureBoxes[slot];
-                    pb.Image = GetMatchingImage(newValue, equippedMateria[slot]);
-                    slots[slot] = newValue;
+                    var currentValue = GetMatchingSlot(rate, slots[slotIndex]);
+                    var pb = pictureBoxes[slotIndex];
+                    pb.Image = GetMatchingImage(newValue, equippedMateria[slotIndex]);
+                    slots[slotIndex] = newValue;
                     if (SlotSelectorType == SlotSelectorType.Slots)
                     {
                         for (int i = 0; i < 4; ++i)
                         {
-                            var mi = menuStrips[slot].Items[i] as ToolStripMenuItem;
+                            var mi = menuStrips[slotIndex].Items[i] as ToolStripMenuItem;
                             if (mi != null)
                             {
                                 mi.Checked = (newValue == GetMatchingSlot(rate, (MateriaSlot)i));
@@ -336,18 +336,18 @@ namespace FF7Scarlet.Shared.Controls
                     //attempt to update neighboring slot(s) as well
                     if (!ignoreLeft || !ignoreRight)
                     {
-                        if (!ignoreLeft && slot > 0) //update slot to the left
+                        if (!ignoreLeft && slotIndex > 0) //update slot to the left
                         {
-                            var prevValue = GetMatchingSlot(slots[slot - 1]);
+                            var prevValue = GetMatchingSlot(slots[slotIndex - 1]);
                             if (SlotIsRightLinked(newValue) && !SlotIsLeftLinked(prevValue))
                             {
                                 if (DataManager.PS3TweaksEnabled && SlotIsRightLinked(prevValue))
                                 {
-                                    SetSlotInner(slot - 1, DOUBLE_LINKED_NORMAL, rate, true, true);
+                                    SetSlotInner(slotIndex - 1, DOUBLE_LINKED_NORMAL, rate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slot - 1, MateriaSlot.NormalLeftLinkedSlot, rate, false, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, rate, false, true);
                                 }
                             }
                             else if (!SlotIsRightLinked(newValue) && SlotIsRightLinked(currentValue)
@@ -355,26 +355,26 @@ namespace FF7Scarlet.Shared.Controls
                             {
                                 if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(prevValue))
                                 {
-                                    SetSlotInner(slot - 1, MateriaSlot.NormalRightLinkedSlot, rate, true, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalRightLinkedSlot, rate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slot - 1, MateriaSlot.NormalUnlinkedSlot, rate, false, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalUnlinkedSlot, rate, false, true);
                                 }
                             }
                         }
-                        if (!ignoreRight && slot < SLOT_COUNT - 1) //update slot to the right
+                        if (!ignoreRight && slotIndex < SLOT_COUNT - 1) //update slot to the right
                         {
-                            var nextValue = GetMatchingSlot(slots[slot + 1]);
+                            var nextValue = GetMatchingSlot(slots[slotIndex + 1]);
                             if (SlotIsLeftLinked(newValue) && !SlotIsRightLinked(nextValue))
                             {
                                 if (DataManager.PS3TweaksEnabled && SlotIsLeftLinked(nextValue))
                                 {
-                                    SetSlotInner(slot + 1, DOUBLE_LINKED_NORMAL, rate, true, true);
+                                    SetSlotInner(slotIndex + 1, DOUBLE_LINKED_NORMAL, rate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slot + 1, MateriaSlot.NormalRightLinkedSlot, rate, true, false);
+                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalRightLinkedSlot, rate, true, false);
                                 }
                             }
                             else if (!SlotIsLeftLinked(newValue) && SlotIsLeftLinked(currentValue)
@@ -382,11 +382,11 @@ namespace FF7Scarlet.Shared.Controls
                             {
                                 if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(nextValue))
                                 {
-                                    SetSlotInner(slot - 1, MateriaSlot.NormalLeftLinkedSlot, rate, true, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, rate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slot + 1, MateriaSlot.NormalUnlinkedSlot, rate, true, false);
+                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalUnlinkedSlot, rate, true, false);
                                 }
                             }
                         }
