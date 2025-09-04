@@ -268,14 +268,7 @@ namespace FF7Scarlet.Shared.Controls
                         //if multi-linked slots are not enabled, ask to enable them
                         if (!multiLinkEnabled)
                         {
-                            var result = MessageBox.Show("This kernel file appears to use multi-linked materia slots! Would you like to enable Postscriptthree Tweaks?",
-                                "Enable Postscriptthree Tweaks?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                            if (result == DialogResult.Yes)
-                            {
-                                DataManager.PS3TweaksEnabled = true;
-                                EnableMultiLinkSlots();
-                                MultiLinkEnabled?.Invoke(this, EventArgs.Empty);
-                            }
+                            AskEnableMultilinkSlots();
                         }
 
                         //if multi-linked slots are enabled, correct the previous slot
@@ -292,6 +285,22 @@ namespace FF7Scarlet.Shared.Controls
                 }
             }
             return success;
+        }
+
+        //if multi-linked slots are not enabled, ask to enable them
+        private bool AskEnableMultilinkSlots()
+        {
+            bool hasEnabledMultilinks = false;
+            var result = MessageBox.Show("This kernel file appears to use multi-linked materia slots! Would you like to enable Postscriptthree Tweaks?",
+                "Enable Postscriptthree Tweaks?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                DataManager.PS3TweaksEnabled = true;
+                EnableMultiLinkSlots();
+                MultiLinkEnabled?.Invoke(this, EventArgs.Empty);
+                hasEnabledMultilinks = true;
+            }
+            return hasEnabledMultilinks;
         }
 
         public bool SetSlot(int slot, MateriaSlot value)
