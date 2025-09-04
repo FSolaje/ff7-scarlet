@@ -249,14 +249,16 @@ namespace FF7Scarlet.Shared.Controls
             return SetSlots(armor.MateriaSlots, armor.GrowthRate);
         }
 
-        public bool SetSlots(MateriaSlot[] slots, GrowthRate rate)
+
+        // First Call to load weapon/armor slots
+        public bool SetSlots(MateriaSlot[] slots, GrowthRate growRate)
         {
             bool success = true;
             int right = 0; //internally, multi-link slots are right links
-            GrowthRate = rate;
+            GrowthRate = growRate;
             for (int i = 0; i < SLOT_COUNT; ++i)
             {
-                if (SetSlotInner(i, slots[i], rate, true, true, true))
+                if (SetSlotInner(i, slots[i], growRate, true, true, true))
                 {
                     //checks for multi-linked slots
                     if (SlotIsRightLinked(slots[i])) { right++; }
@@ -279,7 +281,7 @@ namespace FF7Scarlet.Shared.Controls
                         //if multi-linked slots are enabled, correct the previous slot
                         if (multiLinkEnabled)
                         {
-                            SetSlotInner(i - 1, DOUBLE_LINKED_NORMAL, rate, true, true);
+                            SetSlotInner(i - 1, DOUBLE_LINKED_NORMAL, growRate, true, true);
                         }
                     }
                     InvokeDataChanged(this, EventArgs.Empty);
