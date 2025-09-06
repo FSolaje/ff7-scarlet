@@ -298,7 +298,7 @@ namespace FF7Scarlet.Shared.Controls
                     .ForEach(item =>
                         {
                         // For each double-linked slot, update its visual representation (PictureBox).
-                        UpdateSlotsPintureBox(item.index);
+                        UpdateSlotPictureBox(item.index);
                     InvokeDataChanged(this, EventArgs.Empty);
                     });
 
@@ -326,19 +326,18 @@ namespace FF7Scarlet.Shared.Controls
             return SetSlotInner(slot, value, GrowthRate, false, false);
         }
 
-        private bool SetSlotInner(int slotIndex, MateriaSlot value, GrowthRate rate, bool ignoreLeft, bool ignoreRight,
+        private bool SetSlotInner(int slotIndex, MateriaSlot materiaSlot, GrowthRate growRate, bool ignoreLeft, bool ignoreRight,
             bool forceUpdate = false)
         {
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
-                var newValue = GetMatchingSlot(rate, value);
-                if (slots[slotIndex] != newValue || forceUpdate)
+                var newMateriaSlotValue = GetMatchingSlot(growRate, materiaSlot);
+                if (slots[slotIndex] != newMateriaSlotValue || forceUpdate)
                 {
                     //update slot value
-                    var currentValue = GetMatchingSlot(rate, slots[slotIndex]);
-                    var pb = pictureBoxes[slotIndex];
-                    pb.Image = GetMatchingImage(newValue, equippedMateria[slotIndex]);
-                    slots[slotIndex] = newValue;
+                    var currentValue = GetMatchingSlot(growRate, slots[slotIndex]);
+                    slots[slotIndex] = newMateriaSlotValue;
+                    UpdateSlotPictureBox(slotIndex);
                     if (SlotSelectorType == SlotSelectorType.Slots)
                     {
                         for (int i = 0; i < 4; ++i)
@@ -346,7 +345,7 @@ namespace FF7Scarlet.Shared.Controls
                             var mi = menuStrips[slotIndex].Items[i] as ToolStripMenuItem;
                             if (mi != null)
                             {
-                                mi.Checked = (newValue == GetMatchingSlot(rate, (MateriaSlot)i));
+                                mi.Checked = (newMateriaSlotValue == GetMatchingSlot(growRate, (MateriaSlot)i));
                             }
                         }
                     }
@@ -356,55 +355,55 @@ namespace FF7Scarlet.Shared.Controls
                     {
                         if (!ignoreLeft && slotIndex > 0) //update slot to the left
                         {
-                            var prevValue = GetMatchingSlot(slots[slotIndex - 1]);
-                            if (SlotIsRightLinked(newValue) && !SlotIsLeftLinked(prevValue))
+                            var prevSlotIndexValue = GetMatchingSlot(slots[slotIndex - 1]);
+                            if (SlotIsRightLinked(newMateriaSlotValue) && !SlotIsLeftLinked(prevSlotIndexValue))
                             {
-                                if (DataManager.PS3TweaksEnabled && SlotIsRightLinked(prevValue))
+                                if (DataManager.PS3TweaksEnabled && SlotIsRightLinked(prevSlotIndexValue))
                                 {
-                                    SetSlotInner(slotIndex - 1, DOUBLE_LINKED_NORMAL, rate, true, true);
+                                    SetSlotInner(slotIndex - 1, DOUBLE_LINKED_NORMAL, growRate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, rate, false, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, growRate, false, true);
                                 }
                             }
-                            else if (!SlotIsRightLinked(newValue) && SlotIsRightLinked(currentValue)
-                                && SlotIsLeftLinked(prevValue))
+                            else if (!SlotIsRightLinked(newMateriaSlotValue) && SlotIsRightLinked(currentValue)
+                                && SlotIsLeftLinked(prevSlotIndexValue))
                             {
-                                if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(prevValue))
+                                if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(prevSlotIndexValue))
                                 {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalRightLinkedSlot, rate, true, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalRightLinkedSlot, growRate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalUnlinkedSlot, rate, false, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalUnlinkedSlot, growRate, false, true);
                                 }
                             }
                         }
                         if (!ignoreRight && slotIndex < SLOT_COUNT - 1) //update slot to the right
                         {
                             var nextValue = GetMatchingSlot(slots[slotIndex + 1]);
-                            if (SlotIsLeftLinked(newValue) && !SlotIsRightLinked(nextValue))
+                            if (SlotIsLeftLinked(newMateriaSlotValue) && !SlotIsRightLinked(nextValue))
                             {
                                 if (DataManager.PS3TweaksEnabled && SlotIsLeftLinked(nextValue))
                                 {
-                                    SetSlotInner(slotIndex + 1, DOUBLE_LINKED_NORMAL, rate, true, true);
+                                    SetSlotInner(slotIndex + 1, DOUBLE_LINKED_NORMAL, growRate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalRightLinkedSlot, rate, true, false);
+                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalRightLinkedSlot, growRate, true, false);
                                 }
                             }
-                            else if (!SlotIsLeftLinked(newValue) && SlotIsLeftLinked(currentValue)
+                            else if (!SlotIsLeftLinked(newMateriaSlotValue) && SlotIsLeftLinked(currentValue)
                                 && SlotIsRightLinked(nextValue))
                             {
                                 if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(nextValue))
                                 {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, rate, true, true);
+                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, growRate, true, true);
                                 }
                                 else
                                 {
-                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalUnlinkedSlot, rate, true, false);
+                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalUnlinkedSlot, growRate, true, false);
                                 }
                             }
                         }
@@ -414,6 +413,22 @@ namespace FF7Scarlet.Shared.Controls
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Updates the image displayed in the PictureBox corresponding to the specified slot index.
+        /// Sets the PictureBox's image based on the slot's state and the equipped materia.
+        /// </summary>
+        /// <param name="slotIndex">
+        /// The index of the slot to update. Must be within the valid range of slot indices.
+        /// </param>
+        private void UpdateSlotPictureBox(int slotIndex)
+        {
+            if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
+            {
+                var pb = pictureBoxes[slotIndex];
+                pb.Image = GetMatchingImage(slotIndex, slots[slotIndex], equippedMateria[slotIndex]);
+            }
         }
 
         public void SetMateria(InventoryMateria[] materia, Kernel kernel)
