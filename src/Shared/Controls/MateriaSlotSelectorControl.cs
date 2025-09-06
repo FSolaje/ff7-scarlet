@@ -254,7 +254,7 @@ namespace FF7Scarlet.Shared.Controls
         public bool SetSlots(MateriaSlot[] slots, GrowthRate growRate)
         {
             bool success = true;
-            int right = 0; //internally, multi-link slots are right links
+            if (GrowthRate != growRate)
             GrowthRate = growRate;
             for (int i = 0; i < SLOT_COUNT; ++i)
             {
