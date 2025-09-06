@@ -268,34 +268,40 @@ namespace FF7Scarlet.Shared.Controls
             bool success = true;
             if (GrowthRate != growRate)
             GrowthRate = growRate;
-            for (int i = 0; i < SLOT_COUNT; ++i)
-            {
-                if (SetSlotInner(i, slots[i], growRate, true, true, true))
-                {
-                    //checks for multi-linked slots
-                    if (SlotIsRightLinked(slots[i])) { right++; }
-                    else { right = 0; }
-                    if (right > 1)
-                    {
-                        //if multi-linked slots are not enabled, ask to enable them
-                        if (!multiLinkEnabled)
+
+            // Convert the array into a pared down version using LINQ
+            // Every item is composed of the slot and its index in the original array.
+            var slotsProcessedSuccessfully = slots.Select((slot, index) => new { slot, index })
+                .Where(item => SetSlotInner(item.index, item.slot, growRate, true, true, true))
+                .ToList()
+            ;
+
+            // Check if all slots were processed successfully
+            success = slotsProcessedSuccessfully.Count == SLOT_COUNT;
+
+            // All multilinked slots are processed internally as right-linked
+            var rightSlotsList = slotsProcessedSuccessfully
+                .Where(item => SlotIsRightLinked(item.slot))
+                .ToList()
+            ;
+
+            //if there are multi-linked slots but they are not enabled, ask to enable them
+            if (!multiLinkEnabled && rightSlotsList.Count > 1)
                         {
                             AskEnableMultilinkSlots();
                         }
 
-                        //if multi-linked slots are enabled, correct the previous slot
                         if (multiLinkEnabled)
+                rightSlotsList
+                    .Where(item => SlotIsDoubleLinked(item.index))
+                    .ToList()
+                    .ForEach(item =>
                         {
-                            SetSlotInner(i - 1, DOUBLE_LINKED_NORMAL, growRate, true, true);
-                        }
-                    }
+                        // For each double-linked slot, update its visual representation (PictureBox).
+                        UpdateSlotsPintureBox(item.index);
                     InvokeDataChanged(this, EventArgs.Empty);
-                }
-                else
-                {
-                    success = false;
-                }
-            }
+                    });
+
             return success;
         }
 
