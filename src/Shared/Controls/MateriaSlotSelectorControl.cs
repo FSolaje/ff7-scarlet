@@ -434,6 +434,31 @@ namespace FF7Scarlet.Shared.Controls
             return m;
         }
 
+        /// <summary>
+        /// Determines whether the slot at the specified index is "double linked".
+        /// A slot is considered double linked if it's a right-linked slot and it is not the first or last slot,
+        /// and if the previous slot is left- or right-linked and the next slot is right-linked.
+        /// This method helps to identify slots that are linked on both sides, which may affect
+        /// how materia can be connected or interact in the UI.
+        /// </summary>
+        /// <param name="index">The index of the slot to check.</param>
+        /// <returns>
+        /// <c>true</c> if the slot at the specified index is double linked; otherwise, <c>false</c>.
+        /// </returns>
+        private bool SlotIsDoubleLinked(int index)
+        {
+            bool isDoubleLinked = false;
+
+            if (index > 0 && index < SLOT_COUNT - 1)
+            {
+                var prev = slots[index - 1];
+                var curr = slots[index];
+                var next = slots[index + 1];
+                isDoubleLinked = (SlotIsLeftLinked(prev) || SlotIsRightLinked(prev)) && SlotIsRightLinked(curr) && SlotIsRightLinked(next);
+            }
+
+            return isDoubleLinked;
+        }
         private bool SlotIsUnlinked(MateriaSlot slot)
         {
             return (slot == MateriaSlot.NormalUnlinkedSlot || slot == MateriaSlot.EmptyUnlinkedSlot);
