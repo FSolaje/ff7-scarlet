@@ -130,11 +130,31 @@ namespace FF7Scarlet.Shared.Controls
             multiLinkEnabled = DataManager.PS3TweaksEnabled;
         }
 
-        private Image GetMatchingImage(MateriaSlot slot, Materia? equipped)
+        private Image GetMatchingImage(int slotIndex, MateriaSlot slot, Materia? equipped)
         {
             if (equipped != null) //materia is equipped
             {
                 var fixedSlot = GetMatchingSlot(GrowthRate.Normal, slot);
+
+                if (SlotIsDoubleLinked(slotIndex))
+                {
+                    switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
+                    {
+                        case MateriaType.Independent:
+                            return Properties.Resources.materia_slot_independent_dl;
+                        case MateriaType.Support:
+                            return Properties.Resources.materia_slot_support_dl;
+                        case MateriaType.Magic:
+                            return Properties.Resources.materia_slot_magic_dl;
+                        case MateriaType.Summon:
+                            return Properties.Resources.materia_slot_summon_dl;
+                        case MateriaType.Command:
+                            return Properties.Resources.materia_slot_command_dl;
+                    }
+                }
+                else
+                {
+
                 switch (fixedSlot)
                 {
                     case MateriaSlot.NormalUnlinkedSlot:
@@ -182,25 +202,20 @@ namespace FF7Scarlet.Shared.Controls
                                 return Properties.Resources.materia_slot_command3;
                         }
                         break;
-                    case DOUBLE_LINKED_NORMAL:
-                        switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                        {
-                            case MateriaType.Independent:
-                                return Properties.Resources.materia_slot_independent_dl;
-                            case MateriaType.Support:
-                                return Properties.Resources.materia_slot_support_dl;
-                            case MateriaType.Magic:
-                                return Properties.Resources.materia_slot_magic_dl;
-                            case MateriaType.Summon:
-                                return Properties.Resources.materia_slot_summon_dl;
-                            case MateriaType.Command:
-                                return Properties.Resources.materia_slot_command_dl;
-                        }
-                        break;
+                    }
                 }
             }
             else //no materia equipped
             {
+                if (SlotIsDoubleLinked(slotIndex))
+                {
+                    if (GrowthRate == GrowthRate.None)
+                        return Properties.Resources.materia_slot_dl2;
+                    else
+                        return Properties.Resources.materia_slot_dl1;
+                }
+                else
+                {
                 switch (slot)
                 {
                     case MateriaSlot.NormalUnlinkedSlot:
@@ -215,10 +230,7 @@ namespace FF7Scarlet.Shared.Controls
                         return Properties.Resources.materia_slot5;
                     case MateriaSlot.EmptyRightLinkedSlot:
                         return Properties.Resources.materia_slot6;
-                    case DOUBLE_LINKED_NORMAL:
-                        return Properties.Resources.materia_slot_dl1;
-                    case DOUBLE_LINKED_EMPTY:
-                        return Properties.Resources.materia_slot_dl2;
+                    }
                 }
             }
             return Properties.Resources.materia_slot0;
@@ -407,10 +419,10 @@ namespace FF7Scarlet.Shared.Controls
             }
         }
 
-        public void SetMateria(int slot, Materia? materia)
+        public void SetMateria(int slotIndex, Materia? materia)
         {
-            equippedMateria[slot] = materia;
-            pictureBoxes[slot].Image = GetMatchingImage(slots[slot], materia);
+            equippedMateria[slotIndex] = materia;
+            pictureBoxes[slotIndex].Image = GetMatchingImage(slotIndex, slots[slotIndex], materia);
             InvokeDataChanged(this, EventArgs.Empty);
         }
 
