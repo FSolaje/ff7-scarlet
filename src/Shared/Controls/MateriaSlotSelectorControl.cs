@@ -90,7 +90,7 @@ namespace FF7Scarlet.Shared.Controls
             {
                 for (int i = 0; i < SLOT_COUNT; ++i)
                 {
-                    SetSlotInner(i, GetMatchingSlot(slots[i]), value, true, true);
+                    SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
                 }
                 growthRate = value;
                 InvokeDataChanged(this, EventArgs.Empty);
@@ -134,7 +134,7 @@ namespace FF7Scarlet.Shared.Controls
         {
             if (equipped != null) //materia is equipped
             {
-                var fixedSlot = GetMatchingSlot(GrowthRate.Normal, slot);
+                var fixedSlot = GetMatchingSlot(GrowthRate.Normal, slot, slotIndex);
 
                 if (SlotIsDoubleLinked(slotIndex))
                 {
@@ -331,11 +331,11 @@ namespace FF7Scarlet.Shared.Controls
         {
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
-                var newMateriaSlotValue = GetMatchingSlot(growRate, materiaSlot);
+                var newMateriaSlotValue = GetMatchingSlot(growRate, materiaSlot, slotIndex);
                 if (slots[slotIndex] != newMateriaSlotValue || forceUpdate)
                 {
                     //update slot value
-                    var currentValue = GetMatchingSlot(growRate, slots[slotIndex]);
+                    var currentValue = GetMatchingSlot(growRate, slots[slotIndex], slotIndex);
                     slots[slotIndex] = newMateriaSlotValue;
                     UpdateSlotPictureBox(slotIndex);
                     if (SlotSelectorType == SlotSelectorType.Slots)
@@ -514,37 +514,33 @@ namespace FF7Scarlet.Shared.Controls
             return (slot == DOUBLE_LINKED_NORMAL || slot == DOUBLE_LINKED_EMPTY);
         }
 
-        private MateriaSlot GetMatchingSlot(MateriaSlot slot)
+        private MateriaSlot GetMatchingSlot(MateriaSlot slot, int indexSlot)
         {
-            return GetMatchingSlot(GrowthRate, slot);
+            return GetMatchingSlot(GrowthRate, slot, indexSlot);
         }
 
-        private MateriaSlot GetMatchingSlot(GrowthRate rate, MateriaSlot slot)
+        private MateriaSlot GetMatchingSlot(GrowthRate growRate, MateriaSlot slot, int indexSlot)
         {
-            if (SlotIsUnlinked(slot))
+            var outputMateriaSlot = slot;
+            bool isDoubleLinked(MateriaSlot slot) => SlotIsDoubleLinked(indexSlot);
+
+            var machingSlot = new List<(Predicate<MateriaSlot> matchSlotType, Func<GrowthRate, MateriaSlot> getmaterialSlot)>
             {
-                if (rate == GrowthRate.None) { return MateriaSlot.EmptyUnlinkedSlot; }
-                else { return MateriaSlot.NormalUnlinkedSlot; }
-            }
-            else if (SlotIsDoubleLinked(slot))
-            {
-                if (rate == GrowthRate.None) { return DOUBLE_LINKED_EMPTY; }
-                else { return DOUBLE_LINKED_NORMAL; }
-            }
-            else if (SlotIsLeftLinked(slot))
-            {
-                if (rate == GrowthRate.None) { return MateriaSlot.EmptyLeftLinkedSlot; }
-                else { return MateriaSlot.NormalLeftLinkedSlot; }
-            }
-            else if (SlotIsRightLinked(slot))
-            {
-                if (rate == GrowthRate.None) { return MateriaSlot.EmptyRightLinkedSlot; }
-                else { return MateriaSlot.NormalRightLinkedSlot; }
-            }
-            else
-            {
-                return slot;
-            }
+                (SlotIsUnlinked, growthRate =>
+                    growthRate == GrowthRate.None ? MateriaSlot.EmptyUnlinkedSlot : MateriaSlot.NormalUnlinkedSlot),
+                (isDoubleLinked, growthRate =>
+                    growthRate == GrowthRate.None ? MateriaSlot.EmptyRightLinkedSlot : MateriaSlot.NormalRightLinkedSlot),
+                (SlotIsLeftLinked, growthRate =>
+                    growthRate == GrowthRate.None ? MateriaSlot.EmptyLeftLinkedSlot : MateriaSlot.NormalLeftLinkedSlot),
+                (SlotIsRightLinked, growthRate =>
+                    growthRate == GrowthRate.None ? MateriaSlot.EmptyRightLinkedSlot : MateriaSlot.NormalRightLinkedSlot)
+            };
+
+            foreach (var (matchSlotType, getMateriaSlot) in machingSlot)
+                if (matchSlotType(slot))
+                    outputMateriaSlot = getMateriaSlot(growRate);
+
+            return outputMateriaSlot;
         }
 
         private int GetSlotFromSender(object sender)
@@ -579,7 +575,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalUnlinkedSlot));
+                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalUnlinkedSlot, slot));
             }
         }
 
@@ -588,7 +584,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalLeftLinkedSlot));
+                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalLeftLinkedSlot,slot));
             }
         }
 
@@ -597,7 +593,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot));
+                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot, slot));
             }
         }
 
@@ -606,7 +602,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                SetSlot(slot, GetMatchingSlot(DOUBLE_LINKED_NORMAL));
+                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot, slot));
             }
         }
 
