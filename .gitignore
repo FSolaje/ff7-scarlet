@@ -363,3 +363,14 @@ MigrationBackup/
 FodyWeavers.xsd
 *.DS_Store
 .vs/
+
+# backup files
+*.bak
+*.bak.*
+
+### JetBrains Rider settings
+.idea/
+
+### Visual Studio Code settings
+.vscode/
+
