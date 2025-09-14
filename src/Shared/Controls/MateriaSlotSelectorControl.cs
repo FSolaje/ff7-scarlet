@@ -478,14 +478,14 @@ namespace FF7Scarlet.Shared.Controls
         /// <returns>
         /// <c>true</c> if the slot at the specified index is double linked; otherwise, <c>false</c>.
         /// </returns>
-        private bool SlotIsDoubleLinked(int index)
+        private bool SlotIsDoubleLinked(int index, MateriaSlot? newMateriaSlot = null)
         {
             bool isDoubleLinked = false;
 
             if (index > 0 && index < SLOT_COUNT - 1)
             {
                 var prev = slots[index - 1];
-                var curr = slots[index];
+                var curr = newMateriaSlot ?? slots[index];
                 var next = slots[index + 1];
                 isDoubleLinked = (SlotIsLeftLinked(prev) || SlotIsRightLinked(prev)) && SlotIsRightLinked(curr) && SlotIsRightLinked(next);
             }
@@ -515,7 +515,7 @@ namespace FF7Scarlet.Shared.Controls
         private MateriaSlot GetMatchingSlot(GrowthRate growRate, MateriaSlot slot, int indexSlot)
         {
             var outputMateriaSlot = slot;
-            bool isDoubleLinked(MateriaSlot slot) => SlotIsDoubleLinked(indexSlot);
+            bool isDoubleLinked(MateriaSlot slot) => SlotIsDoubleLinked(indexSlot, slot);
 
             var slotTypeMatcher = new List<(Predicate<MateriaSlot> matchSlotType, Func<GrowthRate, MateriaSlot> getmaterialSlot)>
             {
@@ -577,7 +577,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalLeftLinkedSlot,slot));
+                SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalLeftLinkedSlot, slot));
             }
         }
 
