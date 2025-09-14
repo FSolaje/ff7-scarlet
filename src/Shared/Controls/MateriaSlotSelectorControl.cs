@@ -499,19 +499,12 @@ namespace FF7Scarlet.Shared.Controls
 
         private bool SlotIsLeftLinked(MateriaSlot slot)
         {
-            return (slot == MateriaSlot.NormalLeftLinkedSlot || slot == MateriaSlot.EmptyLeftLinkedSlot
-                || SlotIsDoubleLinked(slot));
+            return (slot == MateriaSlot.NormalLeftLinkedSlot || slot == MateriaSlot.EmptyLeftLinkedSlot);
         }
 
         private bool SlotIsRightLinked(MateriaSlot slot)
         {
-            return (slot == MateriaSlot.NormalRightLinkedSlot || slot == MateriaSlot.EmptyRightLinkedSlot
-                || SlotIsDoubleLinked(slot));
-        }
-
-        private bool SlotIsDoubleLinked(MateriaSlot slot)
-        {
-            return (slot == DOUBLE_LINKED_NORMAL || slot == DOUBLE_LINKED_EMPTY);
+            return (slot == MateriaSlot.NormalRightLinkedSlot || slot == MateriaSlot.EmptyRightLinkedSlot);
         }
 
         private MateriaSlot GetMatchingSlot(MateriaSlot slot, int indexSlot)
@@ -524,7 +517,7 @@ namespace FF7Scarlet.Shared.Controls
             var outputMateriaSlot = slot;
             bool isDoubleLinked(MateriaSlot slot) => SlotIsDoubleLinked(indexSlot);
 
-            var machingSlot = new List<(Predicate<MateriaSlot> matchSlotType, Func<GrowthRate, MateriaSlot> getmaterialSlot)>
+            var slotTypeMatcher = new List<(Predicate<MateriaSlot> matchSlotType, Func<GrowthRate, MateriaSlot> getmaterialSlot)>
             {
                 (SlotIsUnlinked, growthRate =>
                     growthRate == GrowthRate.None ? MateriaSlot.EmptyUnlinkedSlot : MateriaSlot.NormalUnlinkedSlot),
@@ -536,7 +529,7 @@ namespace FF7Scarlet.Shared.Controls
                     growthRate == GrowthRate.None ? MateriaSlot.EmptyRightLinkedSlot : MateriaSlot.NormalRightLinkedSlot)
             };
 
-            foreach (var (matchSlotType, getMateriaSlot) in machingSlot)
+            foreach (var (matchSlotType, getMateriaSlot) in slotTypeMatcher)
                 if (matchSlotType(slot))
                     outputMateriaSlot = getMateriaSlot(growRate);
 
