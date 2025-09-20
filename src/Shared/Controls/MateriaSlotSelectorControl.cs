@@ -67,6 +67,7 @@ namespace FF7Scarlet.Shared.Controls
         private GrowthRate growthRate;
         private PictureBox[] pictureBoxes;
         private ContextMenuStrip[] menuStrips = new ContextMenuStrip[SLOT_COUNT];
+        private (SlotMenuValue Item, int SlotIndex, MateriaSlot PervSlotValue) valueClickedForSlot;
         private int selectedSlot = -1;
         private bool multiLinkEnabled;
 
