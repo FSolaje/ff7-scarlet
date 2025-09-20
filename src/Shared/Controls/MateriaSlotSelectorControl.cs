@@ -532,6 +532,117 @@ namespace FF7Scarlet.Shared.Controls
             }
         }
 
+        // TODO: No terminan de hacer bien las actualizaciones del vecino. Hay que cambiar la lógica para que tenga una
+        // mejor funcionalidad.
+        private void UpdateSlotArrayInDirection(UpdateDirection updateDirection, int fromSlotIndex, MateriaSlot oldRightSlotValue)
+        {
+            int slotIndex = updateDirection == UpdateDirection.Right ? fromSlotIndex + 1 : fromSlotIndex - 1;
+            if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
+            {
+                UpdateSlot(slotIndex, oldRightSlotValue, updateDirection);
+
+            }
+        }
+
+        private void UpdateSlot(int slotIndex, MateriaSlot oldSlotValue, UpdateDirection updateDirection)
+        {
+            int lastSlotIndex = SLOT_COUNT - 1;
+            if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
+            {
+                // Define update direction.
+                bool ignoreLeft = UpdateDirection.Right == updateDirection;
+                bool ignoreRight = UpdateDirection.Left == updateDirection;
+
+                int rightSlotIndex = slotIndex + 1 > lastSlotIndex ? lastSlotIndex : slotIndex + 1;
+                int leftSlotIndex = slotIndex - 1 < 0 ? 0 : slotIndex - 1;
+
+                var rightSlotValue = GetMatchingSlot(slots[rightSlotIndex], rightSlotIndex);
+                var leftSlotValue = GetMatchingSlot(slots[leftSlotIndex], leftSlotIndex);
+                bool isLeftSlotDoubleLinked = SlotIsDoubleLinked(leftSlotIndex);
+                bool leftSlotHasChangeToRightLinked = false;
+
+                if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+                    isLeftSlotDoubleLinked =
+                        isLeftSlotDoubleLinked
+                        || valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+
+                if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+                    leftSlotHasChangeToRightLinked =
+                        SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
+
+                // Compare using old values
+                int backupedIndex = updateDirection == UpdateDirection.Right ? leftSlotIndex : rightSlotIndex;
+                var backupedValue = slots[backupedIndex];
+                slots[backupedIndex] = oldSlotValue;
+                bool wasDoubleLinkedSlot = SlotIsDoubleLinked(slotIndex);
+                slots[backupedIndex] = backupedValue;
+
+                // Comprueba el estado de los link del slot actual.
+                bool isUnlinkedFromRightSlot =
+                    // Is last slot
+                    (slotIndex == rightSlotIndex)
+                    || rightSlotValue == MateriaSlot.None
+                    || SlotIsLeftLinked(rightSlotValue)
+                    || SlotIsUnlinked(rightSlotValue)
+                ;
+
+                bool isUnlinkedFromLeftSlot =
+                    // is first slot
+                    (slotIndex == leftSlotIndex)
+                    || leftSlotValue == MateriaSlot.None
+                    || leftSlotHasChangeToRightLinked
+                    || (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked)
+                    || SlotIsUnlinked(leftSlotValue)
+                ;
+
+                // Define el estado acutal del slot según el estado de los links.
+                bool isUnlinkedSlot = isUnlinkedFromLeftSlot && isUnlinkedFromRightSlot;
+                bool isNonSlot = isUnlinkedFromLeftSlot && slots[slotIndex] == MateriaSlot.None;
+                bool isRightLinked = !isUnlinkedFromLeftSlot && isUnlinkedFromRightSlot;
+                bool isLeftLinked = isUnlinkedFromLeftSlot && !isUnlinkedFromRightSlot;
+                bool isDoubleLinked = !isUnlinkedFromLeftSlot && !isUnlinkedFromRightSlot;
+                switch (updateDirection)
+                {
+                    case UpdateDirection.Left:
+
+                        if (wasDoubleLinkedSlot && isRightLinked)
+                            // ForceUpdate because doublelinked and rightlinked has the same value.
+                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
+
+                        else if (isUnlinkedSlot && !isNonSlot)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
+
+                        else if (isLeftLinked)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+
+                        else if (isDoubleLinked)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
+
+
+                        break;
+
+
+                    case UpdateDirection.Right:
+
+                        if (isLeftLinked)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+
+                        else if (isRightLinked)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+                        else if (isUnlinkedSlot && !isNonSlot)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
+
+                        else if (isDoubleLinked)
+                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+
+
+                        break;
+
+
+                }
+            }
+        }
+
         public void SetMateria(InventoryMateria[] materia, Kernel kernel)
         {
             for (int i = 0; i < 8; ++i)
@@ -618,7 +729,7 @@ namespace FF7Scarlet.Shared.Controls
             var outputMateriaSlot = slot;
             bool isDoubleLinked(MateriaSlot slot) => SlotIsDoubleLinked(indexSlot, slot);
 
-            var slotTypeMatcher = new List<(Predicate<MateriaSlot> matchSlotType, Func<GrowthRate, MateriaSlot> getmaterialSlot)>
+            var slotTypeMatcher = new List<(Predicate<MateriaSlot> matchSlotType, Func<GrowthRate, MateriaSlot> getMateriaSlot)>
             {
                 (SlotIsUnlinked, growthRate =>
                     growthRate == GrowthRate.None ? MateriaSlot.EmptyUnlinkedSlot : MateriaSlot.NormalUnlinkedSlot),
@@ -630,11 +741,8 @@ namespace FF7Scarlet.Shared.Controls
                     growthRate == GrowthRate.None ? MateriaSlot.EmptyRightLinkedSlot : MateriaSlot.NormalRightLinkedSlot)
             };
 
-            foreach (var (matchSlotType, getMateriaSlot) in slotTypeMatcher)
-                if (matchSlotType(slot))
-                    outputMateriaSlot = getMateriaSlot(growRate);
-
-            return outputMateriaSlot;
+            var matcher = slotTypeMatcher.FirstOrDefault(m => m.matchSlotType(slot));
+            return matcher.getMateriaSlot?.Invoke(growRate) ?? outputMateriaSlot;
         }
 
         private int GetSlotFromSender(object sender)
@@ -660,6 +768,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
+                valueClickedForSlot = (SlotMenuValue.NoSlot, slot, slots[slot]);
                 SetSlot(slot, MateriaSlot.None);
             }
         }
@@ -669,6 +778,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
+                valueClickedForSlot = (SlotMenuValue.Unlinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalUnlinkedSlot, slot));
             }
         }
@@ -678,6 +788,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
+                valueClickedForSlot = (SlotMenuValue.LeftLinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalLeftLinkedSlot, slot));
             }
         }
@@ -687,6 +798,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
+                valueClickedForSlot = (SlotMenuValue.RightLinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot, slot));
             }
         }
@@ -696,6 +808,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
+                valueClickedForSlot = (SlotMenuValue.DoubleLinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot, slot));
             }
         }
