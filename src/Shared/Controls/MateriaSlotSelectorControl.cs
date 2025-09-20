@@ -362,6 +362,42 @@ namespace FF7Scarlet.Shared.Controls
             return success;
         }
 
+        private void UpdateSlotSelectorType(int slotIndex)
+        {
+            // TODO: Revisar esto por si genera que no se apliqeun bien los links
+            if (SlotSelectorType == SlotSelectorType.Slots)
+            {
+                var slotMateria = slots[slotIndex];
+                var menuItems = menuStrips[slotIndex].Items;
+
+                var isDoubleLinked = multiLinkEnabled && SlotIsDoubleLinked(slotIndex);
+                Func<int, bool> isEffectiveDoubleLinked = (slotIndex) =>
+                {
+                    if (valueClickedForSlot.SlotIndex == slotIndex)
+                        isDoubleLinked = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+
+                    return isDoubleLinked;
+                };
+
+                var slotCheckConditions = new List<Func<bool>>
+                {
+                    (() => slotMateria == MateriaSlot.None),
+                    (() => SlotIsUnlinked(slotMateria)),
+                    (() => SlotIsLeftLinked(slotMateria)),
+                    (() => SlotIsRightLinked(slotMateria) && !isEffectiveDoubleLinked(slotIndex)),
+                    (() => isEffectiveDoubleLinked(slotIndex))
+                };
+
+                for (int itemIndex = 0; itemIndex < menuItems.Count; ++itemIndex)
+                {
+                    if (menuItems[itemIndex] is ToolStripMenuItem mi)
+                    {
+                        mi.Checked = slotCheckConditions[itemIndex]();
+                    }
+                }
+            }
+        }
+
         //if multi-linked slots are not enabled, ask to enable them
         private bool AskEnableMultilinkSlots()
         {
