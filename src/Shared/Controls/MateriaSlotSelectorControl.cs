@@ -356,8 +356,7 @@ namespace FF7Scarlet.Shared.Controls
                         InvokeDataChanged(this, EventArgs.Empty);
                     });
 
-            // TODO: Revisar esto porque se duplican los checks
-            // Sería conveniente convetir esto en una función aparte.
+            // TODO Sería conveniente convetir esto en una función aparte.
             if (SlotSelectorType == SlotSelectorType.Slots)
             {
                 slotsProcessedSuccessfully
@@ -369,7 +368,6 @@ namespace FF7Scarlet.Shared.Controls
 
         private void UpdateSlotSelectorType(int slotIndex)
         {
-            // TODO: Revisar esto por si genera que no se apliqeun bien los links
             if (SlotSelectorType == SlotSelectorType.Slots)
             {
                 var slotMateria = slots[slotIndex];
@@ -476,8 +474,6 @@ namespace FF7Scarlet.Shared.Controls
             }
         }
 
-        // TODO: No terminan de hacer bien las actualizaciones del vecino. Hay que cambiar la lógica para que tenga una
-        // mejor funcionalidad.
         private void UpdateSlotArrayInDirection(UpdateDirection updateDirection, int fromSlotIndex, MateriaSlot oldRightSlotValue)
         {
             int slotIndex = updateDirection == UpdateDirection.Right ? fromSlotIndex + 1 : fromSlotIndex - 1;
