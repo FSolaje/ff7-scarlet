@@ -254,7 +254,11 @@ namespace FF7Scarlet.Shared.Controls
             }
             else //no materia equipped
             {
-                if (SlotIsDoubleLinked(slotIndex))
+                bool isDoubleLinked = SlotIsDoubleLinked(slotIndex);
+                if (slotIndex == valueClickedForSlot.SlotIndex)
+                    isDoubleLinked = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+
+                if (isDoubleLinked)
                 {
                     if (GrowthRate == GrowthRate.None)
                         return Properties.Resources.materia_slot_dl2;
