@@ -89,27 +89,27 @@ namespace FF7Scarlet.Shared.Controls
                     {
                         menuStrips[i] = new ContextMenuStrip();
 
-                        var menuItem = new ToolStripMenuItem("No slot");
+                        var menuItem = new ToolStripMenuItem(SlotMenuValue.NoSlot.GetDescription());
                         menuItem.Click += new EventHandler(EmptySlotMenu_Clicked);
                         menuStrips[i].Items.Add(menuItem);
 
-                        menuItem = new ToolStripMenuItem("Unlinked slot");
+                        menuItem = new ToolStripMenuItem(SlotMenuValue.Unlinked.GetDescription());
                         menuItem.Click += new EventHandler(UnlinkedSlotMenu_Clicked);
                         menuStrips[i].Items.Add(menuItem);
 
-                        menuItem = new ToolStripMenuItem("Left linked slot");
+                        menuItem = new ToolStripMenuItem(SlotMenuValue.LeftLinked.GetDescription());
                         menuItem.Click += new EventHandler(LeftLinkedSlotMenu_Clicked);
                         if (i == SLOT_COUNT - 1) { menuItem.Enabled = false; }
                         menuStrips[i].Items.Add(menuItem);
 
-                        menuItem = new ToolStripMenuItem("Right linked slot");
+                        menuItem = new ToolStripMenuItem(SlotMenuValue.RightLinked.GetDescription());
                         menuItem.Click += new EventHandler(RightLinkedSlotMenu_Clicked);
                         if (i == 0) { menuItem.Enabled = false; }
                         menuStrips[i].Items.Add(menuItem);
 
                         if (multiLinkEnabled)
                         {
-                            menuItem = new ToolStripMenuItem("Double linked slot");
+                            menuItem = new ToolStripMenuItem(SlotMenuValue.DoubleLinked.GetDescription());
                             menuItem.Click += new EventHandler(DoubleLinkedSlotMenu_Clicked);
                             if (i == 0 || i == SLOT_COUNT - 1) { menuItem.Enabled = false; }
                             menuStrips[i].Items.Add(menuItem);
