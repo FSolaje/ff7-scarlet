@@ -57,9 +57,6 @@ namespace FF7Scarlet.Shared.Controls
     {
         private enum UpdateDirection { Left, Right }
         private const int SLOT_COUNT = 8;
-        private const MateriaSlot
-            DOUBLE_LINKED_EMPTY = (MateriaSlot)8,
-            DOUBLE_LINKED_NORMAL = (MateriaSlot)9;
 
         private SlotSelectorType slotSelectorType;
         private readonly MateriaSlot[] slots = new MateriaSlot[SLOT_COUNT];
@@ -203,53 +200,53 @@ namespace FF7Scarlet.Shared.Controls
                 else
                 {
 
-                switch (fixedSlot)
-                {
-                    case MateriaSlot.NormalUnlinkedSlot:
-                        switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                        {
-                            case MateriaType.Independent:
-                                return Properties.Resources.materia_slot_independent1;
-                            case MateriaType.Support:
-                                return Properties.Resources.materia_slot_support1;
-                            case MateriaType.Magic:
-                                return Properties.Resources.materia_slot_magic1;
-                            case MateriaType.Summon:
-                                return Properties.Resources.materia_slot_summon1;
-                            case MateriaType.Command:
-                                return Properties.Resources.materia_slot_command1;
-                        }
-                        break;
-                    case MateriaSlot.NormalLeftLinkedSlot:
-                        switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                        {
-                            case MateriaType.Independent:
-                                return Properties.Resources.materia_slot_independent2;
-                            case MateriaType.Support:
-                                return Properties.Resources.materia_slot_support2;
-                            case MateriaType.Magic:
-                                return Properties.Resources.materia_slot_magic2;
-                            case MateriaType.Summon:
-                                return Properties.Resources.materia_slot_summon2;
-                            case MateriaType.Command:
-                                return Properties.Resources.materia_slot_command2;
-                        }
-                        break;
-                    case MateriaSlot.NormalRightLinkedSlot:
-                        switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                        {
-                            case MateriaType.Independent:
-                                return Properties.Resources.materia_slot_independent3;
-                            case MateriaType.Support:
-                                return Properties.Resources.materia_slot_support3;
-                            case MateriaType.Magic:
-                                return Properties.Resources.materia_slot_magic3;
-                            case MateriaType.Summon:
-                                return Properties.Resources.materia_slot_summon3;
-                            case MateriaType.Command:
-                                return Properties.Resources.materia_slot_command3;
-                        }
-                        break;
+                    switch (fixedSlot)
+                    {
+                        case MateriaSlot.NormalUnlinkedSlot:
+                            switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
+                            {
+                                case MateriaType.Independent:
+                                    return Properties.Resources.materia_slot_independent1;
+                                case MateriaType.Support:
+                                    return Properties.Resources.materia_slot_support1;
+                                case MateriaType.Magic:
+                                    return Properties.Resources.materia_slot_magic1;
+                                case MateriaType.Summon:
+                                    return Properties.Resources.materia_slot_summon1;
+                                case MateriaType.Command:
+                                    return Properties.Resources.materia_slot_command1;
+                            }
+                            break;
+                        case MateriaSlot.NormalLeftLinkedSlot:
+                            switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
+                            {
+                                case MateriaType.Independent:
+                                    return Properties.Resources.materia_slot_independent2;
+                                case MateriaType.Support:
+                                    return Properties.Resources.materia_slot_support2;
+                                case MateriaType.Magic:
+                                    return Properties.Resources.materia_slot_magic2;
+                                case MateriaType.Summon:
+                                    return Properties.Resources.materia_slot_summon2;
+                                case MateriaType.Command:
+                                    return Properties.Resources.materia_slot_command2;
+                            }
+                            break;
+                        case MateriaSlot.NormalRightLinkedSlot:
+                            switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
+                            {
+                                case MateriaType.Independent:
+                                    return Properties.Resources.materia_slot_independent3;
+                                case MateriaType.Support:
+                                    return Properties.Resources.materia_slot_support3;
+                                case MateriaType.Magic:
+                                    return Properties.Resources.materia_slot_magic3;
+                                case MateriaType.Summon:
+                                    return Properties.Resources.materia_slot_summon3;
+                                case MateriaType.Command:
+                                    return Properties.Resources.materia_slot_command3;
+                            }
+                            break;
                     }
                 }
             }
@@ -268,20 +265,20 @@ namespace FF7Scarlet.Shared.Controls
                 }
                 else
                 {
-                switch (slot)
-                {
-                    case MateriaSlot.NormalUnlinkedSlot:
-                        return Properties.Resources.materia_slot1;
-                    case MateriaSlot.NormalLeftLinkedSlot:
-                        return Properties.Resources.materia_slot2;
-                    case MateriaSlot.NormalRightLinkedSlot:
-                        return Properties.Resources.materia_slot3;
-                    case MateriaSlot.EmptyUnlinkedSlot:
-                        return Properties.Resources.materia_slot4;
-                    case MateriaSlot.EmptyLeftLinkedSlot:
-                        return Properties.Resources.materia_slot5;
-                    case MateriaSlot.EmptyRightLinkedSlot:
-                        return Properties.Resources.materia_slot6;
+                    switch (slot)
+                    {
+                        case MateriaSlot.NormalUnlinkedSlot:
+                            return Properties.Resources.materia_slot1;
+                        case MateriaSlot.NormalLeftLinkedSlot:
+                            return Properties.Resources.materia_slot2;
+                        case MateriaSlot.NormalRightLinkedSlot:
+                            return Properties.Resources.materia_slot3;
+                        case MateriaSlot.EmptyUnlinkedSlot:
+                            return Properties.Resources.materia_slot4;
+                        case MateriaSlot.EmptyLeftLinkedSlot:
+                            return Properties.Resources.materia_slot5;
+                        case MateriaSlot.EmptyRightLinkedSlot:
+                            return Properties.Resources.materia_slot6;
                     }
                 }
             }
@@ -319,7 +316,7 @@ namespace FF7Scarlet.Shared.Controls
         {
             bool success = true;
             if (GrowthRate != growRate)
-            GrowthRate = growRate;
+                GrowthRate = growRate;
 
             for (int i = 0; i < SLOT_COUNT; ++i)
             {
@@ -344,19 +341,19 @@ namespace FF7Scarlet.Shared.Controls
 
             //if there are multi-linked slots but they are not enabled, ask to enable them
             if (!multiLinkEnabled && rightSlotsList.Count > 1)
-                        {
-                            AskEnableMultilinkSlots();
-                        }
+            {
+                AskEnableMultilinkSlots();
+            }
 
-                        if (multiLinkEnabled)
+            if (multiLinkEnabled)
                 rightSlotsList
                     .Where(item => SlotIsDoubleLinked(item.index))
                     .ToList()
                     .ForEach(item =>
-                        {
+                    {
                         // For each double-linked slot, update its visual representation (PictureBox).
                         UpdateSlotPictureBox(item.index);
-                    InvokeDataChanged(this, EventArgs.Empty);
+                        InvokeDataChanged(this, EventArgs.Empty);
                     });
 
             // TODO: Revisar esto porque se duplican los checks
@@ -427,88 +424,35 @@ namespace FF7Scarlet.Shared.Controls
             return SetSlotInner(slot, value, GrowthRate, false, false);
         }
 
-        private bool SetSlotInner(int slotIndex, MateriaSlot materiaSlot, GrowthRate growRate, bool ignoreLeft, bool ignoreRight,
+        private bool SetSlotInner(int slotIndex, MateriaSlot newMateriaSlot, GrowthRate growRate, bool ignoreLeft, bool ignoreRight,
             bool forceUpdate = false)
         {
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
-                var newMateriaSlotValue = GetMatchingSlot(growRate, materiaSlot, slotIndex);
+                if (!forceUpdate)
+                    if (valueClickedForSlot.SlotIndex == slotIndex)
+                        forceUpdate = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+
+                var newMateriaSlotValue = GetMatchingSlot(growRate, newMateriaSlot, slotIndex);
                 if (slots[slotIndex] != newMateriaSlotValue || forceUpdate)
                 {
-                    //update slot value
                     var currentValue = GetMatchingSlot(growRate, slots[slotIndex], slotIndex);
+
+                    //update slot value
                     slots[slotIndex] = newMateriaSlotValue;
                     UpdateSlotPictureBox(slotIndex);
+
                     if (SlotSelectorType == SlotSelectorType.Slots)
                     {
-                        for (int i = 0; i < 4; ++i)
-                        {
-                            var mi = menuStrips[slotIndex].Items[i] as ToolStripMenuItem;
-                            if (mi != null)
-                            {
-                                mi.Checked = (newMateriaSlotValue == GetMatchingSlot(growRate, (MateriaSlot)i));
-                            }
-                        }
+                        UpdateSlotSelectorType(slotIndex);
                     }
 
                     //attempt to update neighboring slot(s) as well
-                    if (!ignoreLeft || !ignoreRight)
-                    {
-                        if (!ignoreLeft && slotIndex > 0) //update slot to the left
-                        {
-                            var prevSlotIndexValue = GetMatchingSlot(slots[slotIndex - 1]);
-                            if (SlotIsRightLinked(newMateriaSlotValue) && !SlotIsLeftLinked(prevSlotIndexValue))
-                            {
-                                if (DataManager.PS3TweaksEnabled && SlotIsRightLinked(prevSlotIndexValue))
-                                {
-                                    SetSlotInner(slotIndex - 1, DOUBLE_LINKED_NORMAL, growRate, true, true);
-                                }
-                                else
-                                {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, growRate, false, true);
-                                }
-                            }
-                            else if (!SlotIsRightLinked(newMateriaSlotValue) && SlotIsRightLinked(currentValue)
-                                && SlotIsLeftLinked(prevSlotIndexValue))
-                            {
-                                if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(prevSlotIndexValue))
-                                {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalRightLinkedSlot, growRate, true, true);
-                                }
-                                else
-                                {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalUnlinkedSlot, growRate, false, true);
-                                }
-                            }
-                        }
-                        if (!ignoreRight && slotIndex < SLOT_COUNT - 1) //update slot to the right
-                        {
-                            var nextValue = GetMatchingSlot(slots[slotIndex + 1]);
-                            if (SlotIsLeftLinked(newMateriaSlotValue) && !SlotIsRightLinked(nextValue))
-                            {
-                                if (DataManager.PS3TweaksEnabled && SlotIsLeftLinked(nextValue))
-                                {
-                                    SetSlotInner(slotIndex + 1, DOUBLE_LINKED_NORMAL, growRate, true, true);
-                                }
-                                else
-                                {
-                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalRightLinkedSlot, growRate, true, false);
-                                }
-                            }
-                            else if (!SlotIsLeftLinked(newMateriaSlotValue) && SlotIsLeftLinked(currentValue)
-                                && SlotIsRightLinked(nextValue))
-                            {
-                                if (DataManager.PS3TweaksEnabled && SlotIsDoubleLinked(nextValue))
-                                {
-                                    SetSlotInner(slotIndex - 1, MateriaSlot.NormalLeftLinkedSlot, growRate, true, true);
-                                }
-                                else
-                                {
-                                    SetSlotInner(slotIndex + 1, MateriaSlot.NormalUnlinkedSlot, growRate, true, false);
-                                }
-                            }
-                        }
-                    }
+                    if (!ignoreLeft)
+                        UpdateSlotArrayInDirection(UpdateDirection.Left, slotIndex, currentValue);
+                    if (!ignoreRight)
+                        UpdateSlotArrayInDirection(UpdateDirection.Right, slotIndex, currentValue);
+
                     InvokeDataChanged(this, EventArgs.Empty);
                     return true;
                 }
