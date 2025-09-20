@@ -359,6 +359,14 @@ namespace FF7Scarlet.Shared.Controls
                     InvokeDataChanged(this, EventArgs.Empty);
                     });
 
+            // TODO: Revisar esto porque se duplican los checks
+            // Sería conveniente convetir esto en una función aparte.
+            if (SlotSelectorType == SlotSelectorType.Slots)
+            {
+                slotsProcessedSuccessfully
+                    .ForEach(item => UpdateSlotSelectorType(item.index));
+            }
+
             return success;
         }
 
