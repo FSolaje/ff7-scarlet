@@ -135,12 +135,13 @@ namespace FF7Scarlet.Shared.Controls
             get { return growthRate; }
             set
             {
-                for (int i = 0; i < SLOT_COUNT; ++i)
-                {
-                    SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
-                }
+                // for (int i = 0; i < SLOT_COUNT; ++i)
+                // {
+                // slots[i] = new MateriaSlot();
+                // SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
+                // }
                 growthRate = value;
-                InvokeDataChanged(this, EventArgs.Empty);
+                // InvokeDataChanged(this, EventArgs.Empty);
             }
         }
 
@@ -319,6 +320,11 @@ namespace FF7Scarlet.Shared.Controls
             bool success = true;
             if (GrowthRate != growRate)
             GrowthRate = growRate;
+
+            for (int i = 0; i < SLOT_COUNT; ++i)
+            {
+                this.slots[i] = new MateriaSlot();
+            }
 
             // Convert the array into a pared down version using LINQ
             // Every item is composed of the slot and its index in the original array.
