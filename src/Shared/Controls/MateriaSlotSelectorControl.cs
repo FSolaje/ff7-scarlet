@@ -55,6 +55,7 @@ namespace FF7Scarlet.Shared.Controls
 
     public partial class MateriaSlotSelectorControl : UserControl
     {
+        private enum UpdateDirection { Left, Right }
         private const int SLOT_COUNT = 8;
         private const MateriaSlot
             DOUBLE_LINKED_EMPTY = (MateriaSlot)8,
