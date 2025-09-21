@@ -134,8 +134,7 @@ namespace FF7Scarlet.Shared.Controls
             {
                 // for (int i = 0; i < SLOT_COUNT; ++i)
                 // {
-                // slots[i] = new MateriaSlot();
-                // SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
+                //     SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
                 // }
                 growthRate = value;
                 // InvokeDataChanged(this, EventArgs.Empty);
@@ -422,8 +421,7 @@ namespace FF7Scarlet.Shared.Controls
             return SetSlotInner(slot, value, GrowthRate, false, false);
         }
 
-        private bool SetSlotInner(int slotIndex, MateriaSlot newMateriaSlot, GrowthRate growRate, bool ignoreLeft, bool ignoreRight,
-            bool forceUpdate = false)
+        private bool SetSlotInner(int slotIndex, MateriaSlot newMateriaSlot, GrowthRate growRate, bool ignoreLeft, bool ignoreRight, bool forceUpdate = false)
         {
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
@@ -513,69 +511,82 @@ namespace FF7Scarlet.Shared.Controls
                         SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
 
                 // Comprueba el estado de los link del slot actual.
-                bool isUnlinkedFromRightSlot =
-                    // Is last slot
-                    (slotIndex == rightSlotIndex)
-                    || rightSlotValue == MateriaSlot.None
-                    || SlotIsLeftLinked(rightSlotValue)
-                    || SlotIsUnlinked(rightSlotValue)
-                ;
-
-                bool isUnlinkedFromLeftSlot =
-                    // is first slot
-                    (slotIndex == leftSlotIndex)
-                    || leftSlotValue == MateriaSlot.None
-                    || leftSlotHasChangeToRightLinked
-                    || (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked)
-                    || SlotIsUnlinked(leftSlotValue)
-                    || updateDirection == UpdateDirection.Right && leftSlotIndex == valueClickedForSlot.SlotIndex && valueClickedForSlot.Item == SlotMenuValue.RightLinked
-                ;
+                bool isUnlinkedFromRightSlot = IsUnlinkedFromRight(slotIndex, rightSlotIndex, rightSlotValue);
+                bool isUnlinkedFromLeftSlot = IsUnlinkedFromLeft(slotIndex, leftSlotIndex, leftSlotValue, isLeftSlotDoubleLinked, leftSlotHasChangeToRightLinked, updateDirection);
 
                 // Define el estado acutal del slot según el estado de los links.
-                bool isUnlinkedSlot = isUnlinkedFromLeftSlot && isUnlinkedFromRightSlot;
-                bool isNonSlot = isUnlinkedFromLeftSlot && slots[slotIndex] == MateriaSlot.None;
-                bool isRightLinked = !isUnlinkedFromLeftSlot && isUnlinkedFromRightSlot;
-                bool isLeftLinked = isUnlinkedFromLeftSlot && !isUnlinkedFromRightSlot;
-                bool isDoubleLinked = !isUnlinkedFromLeftSlot && !isUnlinkedFromRightSlot;
+                var linkState = GetSlotLinkState(isUnlinkedFromLeftSlot, isUnlinkedFromRightSlot, slots[slotIndex]);
                 bool wasDoubleLinked = WasSlotDoubleLinked(slotIndex, oldSlotValue, updateDirection);
 
-                switch (updateDirection)
-                {
-                    case UpdateDirection.Left:
-
-                        if (isRightLinked)
-                            // ForceUpdate because doublelinked and rightlinked has the same value.
-                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, wasDoubleLinked);
-
-                        else if (isUnlinkedSlot && !isNonSlot)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
-
-                        else if (isLeftLinked)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
-
-                        else if (isDoubleLinked)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
-
-                        break;
-
-                    case UpdateDirection.Right:
-
-                        if (isLeftLinked)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
-
-                        else if (isRightLinked)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
-
-                        else if (isUnlinkedSlot && !isNonSlot)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
-
-                        else if (isDoubleLinked)
-                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
-
-                        break;
-
-                }
+                if (updateDirection == UpdateDirection.Left)
+                    UpdateSlotFromLeft(slotIndex, ignoreLeft, ignoreRight, linkState, wasDoubleLinked);
+                else
+                    UpdateSlotFromRight(slotIndex, ignoreLeft, ignoreRight, linkState);
             }
+        }
+
+        private void UpdateSlotFromLeft(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState, bool wasDoubleLinked)
+        {
+            if (linkState.IsRightLinked)
+                // ForceUpdate because doublelinked and rightlinked has the same value.
+                SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, wasDoubleLinked);
+            else if (linkState.IsUnlinked && !linkState.IsNonSlot)
+                SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
+            else if (linkState.IsLeftLinked)
+                SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+            else if (linkState.IsDoubleLinked)
+                SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
+        }
+
+        private void UpdateSlotFromRight(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState)
+        {
+            if (linkState.IsLeftLinked)
+                SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+            else if (linkState.IsRightLinked)
+                SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+            else if (linkState.IsUnlinked && !linkState.IsNonSlot)
+                SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
+            else if (linkState.IsDoubleLinked)
+                SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+        }
+
+        private struct SlotLinkState
+        {
+            public bool IsUnlinked { get; set; }
+            public bool IsRightLinked { get; set; }
+            public bool IsLeftLinked { get; set; }
+            public bool IsDoubleLinked { get; set; }
+            public bool IsNonSlot { get; set; }
+        }
+
+        private SlotLinkState GetSlotLinkState(bool isUnlinkedFromLeft, bool isUnlinkedFromRight, MateriaSlot currentSlot)
+        {
+            return new SlotLinkState
+            {
+                IsUnlinked = isUnlinkedFromLeft && isUnlinkedFromRight,
+                IsRightLinked = !isUnlinkedFromLeft && isUnlinkedFromRight,
+                IsLeftLinked = isUnlinkedFromLeft && !isUnlinkedFromRight,
+                IsDoubleLinked = !isUnlinkedFromLeft && !isUnlinkedFromRight,
+                IsNonSlot = isUnlinkedFromLeft && currentSlot == MateriaSlot.None
+            };
+        }
+
+        private bool IsUnlinkedFromRight(int slotIndex, int rightSlotIndex, MateriaSlot rightSlotValue)
+        {
+            return (slotIndex == rightSlotIndex)
+                   || rightSlotValue == MateriaSlot.None
+                   || SlotIsLeftLinked(rightSlotValue)
+                   || SlotIsUnlinked(rightSlotValue);
+        }
+
+        private bool IsUnlinkedFromLeft(int slotIndex, int leftSlotIndex, MateriaSlot leftSlotValue, bool isLeftSlotDoubleLinked, bool leftSlotHasChangeToRightLinked, UpdateDirection updateDirection)
+        {
+            return (slotIndex == leftSlotIndex)
+                   || leftSlotValue == MateriaSlot.None
+                   || leftSlotHasChangeToRightLinked
+                   || (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked)
+                   || SlotIsUnlinked(leftSlotValue)
+                   || updateDirection == UpdateDirection.Right && leftSlotIndex == valueClickedForSlot.SlotIndex && valueClickedForSlot.Item == SlotMenuValue.RightLinked;
         }
 
         /// <summary>
