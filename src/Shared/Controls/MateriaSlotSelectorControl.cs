@@ -510,13 +510,6 @@ namespace FF7Scarlet.Shared.Controls
                     leftSlotHasChangeToRightLinked =
                         SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
 
-                // Compare using old values
-                int backupedIndex = updateDirection == UpdateDirection.Right ? leftSlotIndex : rightSlotIndex;
-                var backupedValue = slots[backupedIndex];
-                slots[backupedIndex] = oldSlotValue;
-                bool wasDoubleLinkedSlot = SlotIsDoubleLinked(slotIndex);
-                slots[backupedIndex] = backupedValue;
-
                 // Comprueba el estado de los link del slot actual.
                 bool isUnlinkedFromRightSlot =
                     // Is last slot
@@ -541,13 +534,15 @@ namespace FF7Scarlet.Shared.Controls
                 bool isRightLinked = !isUnlinkedFromLeftSlot && isUnlinkedFromRightSlot;
                 bool isLeftLinked = isUnlinkedFromLeftSlot && !isUnlinkedFromRightSlot;
                 bool isDoubleLinked = !isUnlinkedFromLeftSlot && !isUnlinkedFromRightSlot;
+                bool wasDoubleLinked = WasSlotDoubleLinked(slotIndex, oldSlotValue, updateDirection);
+
                 switch (updateDirection)
                 {
                     case UpdateDirection.Left:
 
-                        if (wasDoubleLinkedSlot && isRightLinked)
+                        if (isRightLinked)
                             // ForceUpdate because doublelinked and rightlinked has the same value.
-                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
+                            SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, wasDoubleLinked);
 
                         else if (isUnlinkedSlot && !isNonSlot)
                             SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
@@ -581,6 +576,28 @@ namespace FF7Scarlet.Shared.Controls
 
                 }
             }
+
+        /// <summary>
+        /// Checks if a slot was double-linked before its neighbor was updated.
+        /// </summary>
+        /// <param name="slotIndex">The index of the slot to check.</param>
+        /// <param name="oldNeighborValue">The original value of the neighboring slot.</param>
+        /// <param name="updateDirection">The direction of the neighbor that was changed.</param>
+        /// <returns>True if the slot was double-linked, otherwise false.</returns>
+        private bool WasSlotDoubleLinked(int slotIndex, MateriaSlot oldNeighborValue, UpdateDirection updateDirection)
+        {
+            bool wasSlotDoubleLinked = false;
+            int indexToCheck = updateDirection == UpdateDirection.Right ? slotIndex - 1 : slotIndex + 1;
+            if (indexToCheck >= 0 && indexToCheck < SLOT_COUNT)
+            {
+                var backup = slots[indexToCheck];
+                slots[indexToCheck] = oldNeighborValue;
+                wasSlotDoubleLinked = SlotIsDoubleLinked(slotIndex);
+                slots[indexToCheck] = backup;
+            }
+
+            return wasSlotDoubleLinked;
+
         }
 
         public void SetMateria(InventoryMateria[] materia, Kernel kernel)
