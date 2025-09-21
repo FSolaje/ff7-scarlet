@@ -1,4 +1,4 @@
-﻿using FF7Scarlet.KernelEditor;
+using FF7Scarlet.KernelEditor;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
@@ -539,6 +539,7 @@ namespace FF7Scarlet.Shared.Controls
         /// <summary>
         /// Determines if the left slot has just changed from a left-linked to a right-linked state.
         /// This is a specific edge case that breaks the link with the current slot.
+        /// Note that a Double-linked slot is also considered Right-linked for this check.
         /// </summary>
         /// <param name="leftSlotIndex">The index of the left slot.</param>
         /// <param name="leftSlotValue">The current value of the left slot.</param>
