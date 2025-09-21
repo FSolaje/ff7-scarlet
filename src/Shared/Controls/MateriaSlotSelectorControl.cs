@@ -429,7 +429,9 @@ namespace FF7Scarlet.Shared.Controls
             {
                 if (!forceUpdate)
                     if (valueClickedForSlot.SlotIndex == slotIndex)
-                        forceUpdate = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+                        forceUpdate = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked
+                            || (valueClickedForSlot.Item == SlotMenuValue.RightLinked && SlotIsDoubleLinked(slotIndex))
+                        ;
 
                 var newMateriaSlotValue = GetMatchingSlot(growRate, newMateriaSlot, slotIndex);
                 if (slots[slotIndex] != newMateriaSlotValue || forceUpdate)
@@ -526,6 +528,7 @@ namespace FF7Scarlet.Shared.Controls
                     || leftSlotHasChangeToRightLinked
                     || (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked)
                     || SlotIsUnlinked(leftSlotValue)
+                    || updateDirection == UpdateDirection.Right && leftSlotIndex == valueClickedForSlot.SlotIndex && valueClickedForSlot.Item == SlotMenuValue.RightLinked
                 ;
 
                 // Define el estado acutal del slot según el estado de los links.
@@ -553,9 +556,7 @@ namespace FF7Scarlet.Shared.Controls
                         else if (isDoubleLinked)
                             SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
 
-
                         break;
-
 
                     case UpdateDirection.Right:
 
@@ -564,18 +565,18 @@ namespace FF7Scarlet.Shared.Controls
 
                         else if (isRightLinked)
                             SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
+
                         else if (isUnlinkedSlot && !isNonSlot)
                             SetSlotInner(slotIndex, MateriaSlot.NormalUnlinkedSlot, growthRate, ignoreLeft, ignoreRight);
 
                         else if (isDoubleLinked)
                             SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight);
 
-
                         break;
-
 
                 }
             }
+        }
 
         /// <summary>
         /// Checks if a slot was double-linked before its neighbor was updated.
