@@ -498,17 +498,8 @@ namespace FF7Scarlet.Shared.Controls
 
                 var rightSlotValue = GetMatchingSlot(slots[rightSlotIndex], rightSlotIndex);
                 var leftSlotValue = GetMatchingSlot(slots[leftSlotIndex], leftSlotIndex);
-                bool isLeftSlotDoubleLinked = SlotIsDoubleLinked(leftSlotIndex);
-                bool leftSlotHasChangeToRightLinked = false;
-
-                if (valueClickedForSlot.SlotIndex == leftSlotIndex)
-                    isLeftSlotDoubleLinked =
-                        isLeftSlotDoubleLinked
-                        || valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
-
-                if (valueClickedForSlot.SlotIndex == leftSlotIndex)
-                    leftSlotHasChangeToRightLinked =
-                        SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
+                bool isLeftSlotDoubleLinked = GetEffectiveIsLeftSlotDoubleLinked(leftSlotIndex);
+                bool leftSlotHasChangeToRightLinked = GetLeftSlotHasChangeToRightLinked(leftSlotIndex, leftSlotValue);
 
                 // Comprueba el estado de los link del slot actual.
                 bool isUnlinkedFromRightSlot = IsUnlinkedFromRight(slotIndex, rightSlotIndex, rightSlotValue);
@@ -519,14 +510,37 @@ namespace FF7Scarlet.Shared.Controls
                 bool wasDoubleLinked = WasSlotDoubleLinked(slotIndex, oldSlotValue, updateDirection);
 
                 if (updateDirection == UpdateDirection.Left)
+                {
                     UpdateSlotFromLeft(slotIndex, ignoreLeft, ignoreRight, linkState, wasDoubleLinked);
+                }
                 else
+                {
                     UpdateSlotFromRight(slotIndex, ignoreLeft, ignoreRight, linkState);
+                }
             }
+        }
+
+        private bool GetEffectiveIsLeftSlotDoubleLinked(int leftSlotIndex)
+        {
+            bool isLeftSlotDoubleLinked = SlotIsDoubleLinked(leftSlotIndex);
+            if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+                isLeftSlotDoubleLinked = isLeftSlotDoubleLinked || valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+
+            return isLeftSlotDoubleLinked;
+        }
+
+        private bool GetLeftSlotHasChangeToRightLinked(int leftSlotIndex, MateriaSlot leftSlotValue)
+        {
+            bool output = false;
+            if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+                output = SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
+
+            return output;
         }
 
         private void UpdateSlotFromLeft(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState, bool wasDoubleLinked)
         {
+
             if (linkState.IsRightLinked)
                 // ForceUpdate because doublelinked and rightlinked has the same value.
                 SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, wasDoubleLinked);
