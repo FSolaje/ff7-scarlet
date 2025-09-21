@@ -1,4 +1,4 @@
-using FF7Scarlet.KernelEditor;
+﻿using FF7Scarlet.KernelEditor;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
@@ -548,7 +548,9 @@ namespace FF7Scarlet.Shared.Controls
             bool result = false;
             if (valueClickedForSlot.SlotIndex == leftSlotIndex)
             {
-                result = SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
+                result = SlotIsLeftLinked(valueClickedForSlot.PervSlotValue)
+                && SlotIsRightLinked(leftSlotValue)
+                && !(valueClickedForSlot.Item == SlotMenuValue.DoubleLinked);
             }
             return result;
         }
@@ -615,11 +617,11 @@ namespace FF7Scarlet.Shared.Controls
             bool result = slotIndex == leftSlotIndex;
             result |= leftSlotValue == MateriaSlot.None;
             result |= leftSlotHasChangeToRightLinked;
-            result |= (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked);
+            result |= !SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked;
             result |= SlotIsUnlinked(leftSlotValue);
-            result |= (updateDirection == UpdateDirection.Right
+            result |= updateDirection == UpdateDirection.Right
                                 && leftSlotIndex == valueClickedForSlot.SlotIndex
-                                && valueClickedForSlot.Item == SlotMenuValue.RightLinked);
+                                && valueClickedForSlot.Item == SlotMenuValue.RightLinked;
 
             return result;
         }
