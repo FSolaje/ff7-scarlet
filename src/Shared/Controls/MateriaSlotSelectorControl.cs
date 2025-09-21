@@ -1,4 +1,4 @@
-﻿using FF7Scarlet.KernelEditor;
+using FF7Scarlet.KernelEditor;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
@@ -520,22 +520,37 @@ namespace FF7Scarlet.Shared.Controls
             }
         }
 
+        /// <summary>
+        /// Calculates if the left slot should be considered as double-linked,
+        /// taking into account the user's most recent action.
+        /// </summary>
+        /// <param name="leftSlotIndex">The index of the left slot.</param>
+        /// <returns>True if the left slot is or will be double-linked; otherwise, false.</returns>
         private bool GetEffectiveIsLeftSlotDoubleLinked(int leftSlotIndex)
         {
             bool isLeftSlotDoubleLinked = SlotIsDoubleLinked(leftSlotIndex);
             if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+            {
                 isLeftSlotDoubleLinked = isLeftSlotDoubleLinked || valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
-
+            }
             return isLeftSlotDoubleLinked;
         }
 
+        /// <summary>
+        /// Determines if the left slot has just changed from a left-linked to a right-linked state.
+        /// This is a specific edge case that breaks the link with the current slot.
+        /// </summary>
+        /// <param name="leftSlotIndex">The index of the left slot.</param>
+        /// <param name="leftSlotValue">The current value of the left slot.</param>
+        /// <returns>True if the slot has changed from a left-link to a right-link; otherwise, false.</returns>
         private bool GetLeftSlotHasChangeToRightLinked(int leftSlotIndex, MateriaSlot leftSlotValue)
         {
-            bool output = false;
+            bool result = false;
             if (valueClickedForSlot.SlotIndex == leftSlotIndex)
-                output = SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
-
-            return output;
+            {
+                result = SlotIsLeftLinked(valueClickedForSlot.PervSlotValue) && SlotIsRightLinked(leftSlotValue);
+            }
+            return result;
         }
 
         private void UpdateSlotFromLeft(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState, bool wasDoubleLinked)
