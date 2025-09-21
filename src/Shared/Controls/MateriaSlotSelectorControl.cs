@@ -602,20 +602,26 @@ namespace FF7Scarlet.Shared.Controls
 
         private bool IsUnlinkedFromRight(int slotIndex, int rightSlotIndex, MateriaSlot rightSlotValue)
         {
-            return (slotIndex == rightSlotIndex)
-                   || rightSlotValue == MateriaSlot.None
-                   || SlotIsLeftLinked(rightSlotValue)
-                   || SlotIsUnlinked(rightSlotValue);
+            bool result = slotIndex == rightSlotIndex;
+            result |= rightSlotValue == MateriaSlot.None;
+            result |= SlotIsLeftLinked(rightSlotValue);
+            result |= SlotIsUnlinked(rightSlotValue);
+
+            return result;
         }
 
         private bool IsUnlinkedFromLeft(int slotIndex, int leftSlotIndex, MateriaSlot leftSlotValue, bool isLeftSlotDoubleLinked, bool leftSlotHasChangeToRightLinked, UpdateDirection updateDirection)
         {
-            return (slotIndex == leftSlotIndex)
-                   || leftSlotValue == MateriaSlot.None
-                   || leftSlotHasChangeToRightLinked
-                   || (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked)
-                   || SlotIsUnlinked(leftSlotValue)
-                   || updateDirection == UpdateDirection.Right && leftSlotIndex == valueClickedForSlot.SlotIndex && valueClickedForSlot.Item == SlotMenuValue.RightLinked;
+            bool result = slotIndex == leftSlotIndex;
+            result |= leftSlotValue == MateriaSlot.None;
+            result |= leftSlotHasChangeToRightLinked;
+            result |= (!SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked);
+            result |= SlotIsUnlinked(leftSlotValue);
+            result |= (updateDirection == UpdateDirection.Right
+                                && leftSlotIndex == valueClickedForSlot.SlotIndex
+                                && valueClickedForSlot.Item == SlotMenuValue.RightLinked);
+
+            return result;
         }
 
         /// <summary>
