@@ -428,7 +428,7 @@ namespace FF7Scarlet.Shared.Controls
             return SetSlotInner(slot, value, GrowthRate, false, false);
         }
 
-        private bool SetSlotInner(int slotIndex, MateriaSlot newMateriaSlot, GrowthRate growRate, bool ignoreLeft, bool ignoreRight, bool forceUpdate = false)
+        private bool SetSlotInner(int slotIndex, MateriaSlot newMateriaSlot, GrowthRate growthRate, bool ignoreLeft, bool ignoreRight, bool forceUpdate = false)
         {
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
@@ -438,10 +438,10 @@ namespace FF7Scarlet.Shared.Controls
                             || (valueClickedForSlot.Item == SlotMenuValue.RightLinked && SlotIsDoubleLinked(slotIndex))
                         ;
 
-                var newMateriaSlotValue = GetMatchingSlot(growRate, newMateriaSlot, slotIndex);
+                var newMateriaSlotValue = GetMatchingSlot(growthRate, newMateriaSlot, slotIndex);
                 if (slots[slotIndex] != newMateriaSlotValue || forceUpdate)
                 {
-                    var currentValue = GetMatchingSlot(growRate, slots[slotIndex], slotIndex);
+                    var currentValue = GetMatchingSlot(growthRate, slots[slotIndex], slotIndex);
 
                     //update slot value
                     slots[slotIndex] = newMateriaSlotValue;
