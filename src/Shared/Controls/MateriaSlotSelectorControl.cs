@@ -173,11 +173,11 @@ namespace FF7Scarlet.Shared.Controls
         public MateriaSlotSelectorControl()
         {
             InitializeComponent();
-            pictureBoxes = new PictureBox[SLOT_COUNT]
-            {
-                pictureBoxSlot1, pictureBoxSlot2, pictureBoxSlot3, pictureBoxSlot4, pictureBoxSlot5,
-                pictureBoxSlot6, pictureBoxSlot7, pictureBoxSlot8
-            };
+            pictureBoxes =
+			[
+				pictureBoxSlot1, pictureBoxSlot2, pictureBoxSlot3, pictureBoxSlot4, pictureBoxSlot5, pictureBoxSlot6, pictureBoxSlot7, pictureBoxSlot8
+            ];
+
             multiLinkEnabled = DataManager.PS3TweaksEnabled;
         }
 
