@@ -3,8 +3,8 @@ using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Reflection;
+using FF7Scarlet.Shared.Models;
 
 namespace FF7Scarlet.Shared.Controls
 {
@@ -186,109 +186,15 @@ namespace FF7Scarlet.Shared.Controls
             if (equipped != null) //materia is equipped
             {
                 var fixedSlot = GetMatchingSlot(GrowthRate.Normal, slot, slotIndex);
+                var materiaType = MateriaExt.GetMateriaType(equipped.MateriaTypeByte);
 
-                if (SlotIsDoubleLinked(slotIndex))
-                {
-                    switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                    {
-                        case MateriaType.Independent:
-                            return Properties.Resources.materia_slot_independent_dl;
-                        case MateriaType.Support:
-                            return Properties.Resources.materia_slot_support_dl;
-                        case MateriaType.Magic:
-                            return Properties.Resources.materia_slot_magic_dl;
-                        case MateriaType.Summon:
-                            return Properties.Resources.materia_slot_summon_dl;
-                        case MateriaType.Command:
-                            return Properties.Resources.materia_slot_command_dl;
-                    }
-                }
-                else
-                {
-
-                    switch (fixedSlot)
-                    {
-                        case MateriaSlot.NormalUnlinkedSlot:
-                            switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                            {
-                                case MateriaType.Independent:
-                                    return Properties.Resources.materia_slot_independent1;
-                                case MateriaType.Support:
-                                    return Properties.Resources.materia_slot_support1;
-                                case MateriaType.Magic:
-                                    return Properties.Resources.materia_slot_magic1;
-                                case MateriaType.Summon:
-                                    return Properties.Resources.materia_slot_summon1;
-                                case MateriaType.Command:
-                                    return Properties.Resources.materia_slot_command1;
-                            }
-                            break;
-                        case MateriaSlot.NormalLeftLinkedSlot:
-                            switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                            {
-                                case MateriaType.Independent:
-                                    return Properties.Resources.materia_slot_independent2;
-                                case MateriaType.Support:
-                                    return Properties.Resources.materia_slot_support2;
-                                case MateriaType.Magic:
-                                    return Properties.Resources.materia_slot_magic2;
-                                case MateriaType.Summon:
-                                    return Properties.Resources.materia_slot_summon2;
-                                case MateriaType.Command:
-                                    return Properties.Resources.materia_slot_command2;
-                            }
-                            break;
-                        case MateriaSlot.NormalRightLinkedSlot:
-                            switch (MateriaExt.GetMateriaType(equipped.MateriaTypeByte))
-                            {
-                                case MateriaType.Independent:
-                                    return Properties.Resources.materia_slot_independent3;
-                                case MateriaType.Support:
-                                    return Properties.Resources.materia_slot_support3;
-                                case MateriaType.Magic:
-                                    return Properties.Resources.materia_slot_magic3;
-                                case MateriaType.Summon:
-                                    return Properties.Resources.materia_slot_summon3;
-                                case MateriaType.Command:
-                                    return Properties.Resources.materia_slot_command3;
-                            }
-                            break;
-                    }
-                }
+                return SlotImage.GetSlotImageForEquipedMateria(materiaType, fixedSlot, SlotIsDoubleLinked(slotIndex));
             }
             else //no materia equipped
             {
-                bool isDoubleLinked = SlotIsDoubleLinked(slotIndex);
-                if (slotIndex == valueClickedForSlot.SlotIndex)
-                    isDoubleLinked = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
-
-                if (isDoubleLinked)
-                {
-                    if (GrowthRate == GrowthRate.None)
-                        return Properties.Resources.materia_slot_dl2;
-                    else
-                        return Properties.Resources.materia_slot_dl1;
-                }
-                else
-                {
-                    switch (slot)
-                    {
-                        case MateriaSlot.NormalUnlinkedSlot:
-                            return Properties.Resources.materia_slot1;
-                        case MateriaSlot.NormalLeftLinkedSlot:
-                            return Properties.Resources.materia_slot2;
-                        case MateriaSlot.NormalRightLinkedSlot:
-                            return Properties.Resources.materia_slot3;
-                        case MateriaSlot.EmptyUnlinkedSlot:
-                            return Properties.Resources.materia_slot4;
-                        case MateriaSlot.EmptyLeftLinkedSlot:
-                            return Properties.Resources.materia_slot5;
-                        case MateriaSlot.EmptyRightLinkedSlot:
-                            return Properties.Resources.materia_slot6;
-                    }
-                }
+                return SlotImage.GetSlotImageForEmpty(slot, SlotIsDoubleLinked(slotIndex));
             }
-            return Properties.Resources.materia_slot0;
+
         }
 
         public void EnableMultiLinkSlots()
