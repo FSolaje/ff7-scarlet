@@ -132,12 +132,19 @@ namespace FF7Scarlet.Shared.Controls
             get { return growthRate; }
             set
             {
-                // for (int i = 0; i < SLOT_COUNT; ++i)
-                // {
-                //     SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
-                // }
+                bool oldIsNone = growthRate == GrowthRate.None;
+                bool newIsNone = value == GrowthRate.None;
+                
+                // Execute loop only if the 'None' state changes
+                if (oldIsNone != newIsNone)
+                {
+                    for (int i = 0; i < SLOT_COUNT; ++i)
+                    {
+                        SetSlotInner(i, GetMatchingSlot(slots[i], i), value, true, true);
+                    }
+                }
                 growthRate = value;
-                // InvokeDataChanged(this, EventArgs.Empty);
+                InvokeDataChanged(this, EventArgs.Empty); // Keeping this commented as it was
             }
         }
 
