@@ -1,4 +1,4 @@
-﻿using FF7Scarlet.KernelEditor;
+using FF7Scarlet.KernelEditor;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
@@ -64,7 +64,7 @@ namespace FF7Scarlet.Shared.Controls
         private GrowthRate growthRate;
         private PictureBox[] pictureBoxes;
         private ContextMenuStrip[] menuStrips = new ContextMenuStrip[SLOT_COUNT];
-        private (SlotMenuValue Item, int SlotIndex, MateriaSlot PervSlotValue) valueClickedForSlot;
+        private (SlotMenuValue Item, int SlotIndex, MateriaSlot PervSlotValue) slotClickedInSlectorType;
         private int selectedSlot = -1;
         private bool multiLinkEnabled;
 
@@ -134,7 +134,7 @@ namespace FF7Scarlet.Shared.Controls
             {
                 bool oldIsNone = growthRate == GrowthRate.None;
                 bool newIsNone = value == GrowthRate.None;
-                
+
                 // Execute loop only if the 'None' state changes
                 if (oldIsNone != newIsNone)
                 {
@@ -144,7 +144,7 @@ namespace FF7Scarlet.Shared.Controls
                     }
                 }
                 growthRate = value;
-                InvokeDataChanged(this, EventArgs.Empty); // Keeping this commented as it was
+                InvokeDataChanged(this, EventArgs.Empty);
             }
         }
 
@@ -174,8 +174,8 @@ namespace FF7Scarlet.Shared.Controls
         {
             InitializeComponent();
             pictureBoxes =
-			[
-				pictureBoxSlot1, pictureBoxSlot2, pictureBoxSlot3, pictureBoxSlot4, pictureBoxSlot5, pictureBoxSlot6, pictureBoxSlot7, pictureBoxSlot8
+            [
+                pictureBoxSlot1, pictureBoxSlot2, pictureBoxSlot3, pictureBoxSlot4, pictureBoxSlot5, pictureBoxSlot6, pictureBoxSlot7, pictureBoxSlot8
             ];
 
             multiLinkEnabled = DataManager.PS3TweaksEnabled;
@@ -183,16 +183,27 @@ namespace FF7Scarlet.Shared.Controls
 
         private Image GetMatchingImage(int slotIndex, MateriaSlot slot, Materia? equipped)
         {
+            bool isDoubleLinkedSlot = SlotIsDoubleLinked(slotIndex);
+
+            if (slotClickedInSlectorType.SlotIndex == slotIndex)
+            {
+                isDoubleLinkedSlot = isDoubleLinkedSlot ?
+                     // If slot hasn't changed from Doublelinked to Right, is a double linked slot.
+                     isDoubleLinkedSlot && !HasChangedSlotFomDoubleLinkedToRightLinked(slotIndex)
+                     // If slot has changed to double linked slot, is a double linked slot.
+                     : isDoubleLinkedSlot || HasChangeSlotToDoubleLinked();
+            }
+
             if (equipped != null) //materia is equipped
             {
                 var fixedSlot = GetMatchingSlot(GrowthRate.Normal, slot, slotIndex);
                 var materiaType = MateriaExt.GetMateriaType(equipped.MateriaTypeByte);
 
-                return SlotImage.GetSlotImageForEquipedMateria(materiaType, fixedSlot, SlotIsDoubleLinked(slotIndex));
+                return SlotImage.GetSlotImageForEquipedMateria(materiaType, fixedSlot, isDoubleLinkedSlot);
             }
             else //no materia equipped
             {
-                return SlotImage.GetSlotImageForEmpty(slot, SlotIsDoubleLinked(slotIndex));
+                return SlotImage.GetSlotImageForEmpty(slot, isDoubleLinkedSlot);
             }
 
         }
@@ -288,8 +299,8 @@ namespace FF7Scarlet.Shared.Controls
                 var isDoubleLinked = multiLinkEnabled && SlotIsDoubleLinked(slotIndex);
                 Func<int, bool> isEffectiveDoubleLinked = (slotIndex) =>
                 {
-                    if (valueClickedForSlot.SlotIndex == slotIndex)
-                        isDoubleLinked = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+                    if (slotClickedInSlectorType.SlotIndex == slotIndex)
+                        isDoubleLinked = HasChangeSlotToDoubleLinked();
 
                     return isDoubleLinked;
                 };
@@ -339,9 +350,9 @@ namespace FF7Scarlet.Shared.Controls
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
             {
                 if (!forceUpdate)
-                    if (valueClickedForSlot.SlotIndex == slotIndex)
-                        forceUpdate = valueClickedForSlot.Item == SlotMenuValue.DoubleLinked
-                            || (valueClickedForSlot.Item == SlotMenuValue.RightLinked && SlotIsDoubleLinked(slotIndex))
+                    if (slotClickedInSlectorType.SlotIndex == slotIndex)
+                        forceUpdate = HasChangeSlotToDoubleLinked()
+                            || HasChangedSlotFomDoubleLinkedToRightLinked(slotIndex)
                         ;
 
                 var newMateriaSlotValue = GetMatchingSlot(growthRate, newMateriaSlot, slotIndex);
@@ -369,6 +380,20 @@ namespace FF7Scarlet.Shared.Controls
                 }
             }
             return false;
+        }
+
+        private bool HasChangedSlotFomDoubleLinkedToRightLinked(int slotIndex)
+        {
+            bool hasChanged = slotClickedInSlectorType.Item == SlotMenuValue.RightLinked
+                    && SlotIsDoubleLinked(slotIndex);
+
+            return hasChanged; 
+        }
+
+        private bool HasChangeSlotToDoubleLinked()
+        {
+            return  slotClickedInSlectorType.Item == SlotMenuValue.DoubleLinked;
+
         }
 
         /// <summary>
@@ -442,9 +467,9 @@ namespace FF7Scarlet.Shared.Controls
         private bool GetEffectiveIsLeftSlotDoubleLinked(int leftSlotIndex)
         {
             bool isLeftSlotDoubleLinked = SlotIsDoubleLinked(leftSlotIndex);
-            if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+            if (slotClickedInSlectorType.SlotIndex == leftSlotIndex)
             {
-                isLeftSlotDoubleLinked = isLeftSlotDoubleLinked || valueClickedForSlot.Item == SlotMenuValue.DoubleLinked;
+                isLeftSlotDoubleLinked = isLeftSlotDoubleLinked || HasChangeSlotToDoubleLinked();
             }
             return isLeftSlotDoubleLinked;
         }
@@ -459,11 +484,11 @@ namespace FF7Scarlet.Shared.Controls
         private bool GetLeftSlotHasChangeToRightLinked(int leftSlotIndex, MateriaSlot leftSlotValue)
         {
             bool result = false;
-            if (valueClickedForSlot.SlotIndex == leftSlotIndex)
+            if (slotClickedInSlectorType.SlotIndex == leftSlotIndex)
             {
-                result = SlotIsLeftLinked(valueClickedForSlot.PervSlotValue)
+                result = SlotIsLeftLinked(slotClickedInSlectorType.PervSlotValue)
                 && SlotIsRightLinked(leftSlotValue)
-                && !(valueClickedForSlot.Item == SlotMenuValue.DoubleLinked);
+                && !HasChangeSlotToDoubleLinked();
             }
             return result;
         }
@@ -533,8 +558,8 @@ namespace FF7Scarlet.Shared.Controls
             result |= !SlotIsLeftLinked(leftSlotValue) && !isLeftSlotDoubleLinked;
             result |= SlotIsUnlinked(leftSlotValue);
             result |= updateDirection == UpdateDirection.Right
-                                && leftSlotIndex == valueClickedForSlot.SlotIndex
-                                && valueClickedForSlot.Item == SlotMenuValue.RightLinked;
+                                && leftSlotIndex == slotClickedInSlectorType.SlotIndex
+                                && slotClickedInSlectorType.Item == SlotMenuValue.RightLinked;
 
             return result;
         }
@@ -687,7 +712,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                valueClickedForSlot = (SlotMenuValue.NoSlot, slot, slots[slot]);
+                slotClickedInSlectorType = (SlotMenuValue.NoSlot, slot, slots[slot]);
                 SetSlot(slot, MateriaSlot.None);
             }
         }
@@ -697,7 +722,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                valueClickedForSlot = (SlotMenuValue.Unlinked, slot, slots[slot]);
+                slotClickedInSlectorType = (SlotMenuValue.Unlinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalUnlinkedSlot, slot));
             }
         }
@@ -707,7 +732,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                valueClickedForSlot = (SlotMenuValue.LeftLinked, slot, slots[slot]);
+                slotClickedInSlectorType = (SlotMenuValue.LeftLinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalLeftLinkedSlot, slot));
             }
         }
@@ -717,7 +742,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                valueClickedForSlot = (SlotMenuValue.RightLinked, slot, slots[slot]);
+                slotClickedInSlectorType = (SlotMenuValue.RightLinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot, slot));
             }
         }
@@ -727,7 +752,7 @@ namespace FF7Scarlet.Shared.Controls
             if (sender != null)
             {
                 int slot = GetSlotFromSender(sender);
-                valueClickedForSlot = (SlotMenuValue.DoubleLinked, slot, slots[slot]);
+                slotClickedInSlectorType = (SlotMenuValue.DoubleLinked, slot, slots[slot]);
                 SetSlot(slot, GetMatchingSlot(MateriaSlot.NormalRightLinkedSlot, slot));
             }
         }
