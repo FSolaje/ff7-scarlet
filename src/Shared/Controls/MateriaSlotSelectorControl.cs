@@ -153,7 +153,7 @@ namespace FF7Scarlet.Shared.Controls
             if (equipped != null) //materia is equipped
             {
                 var fixedSlot = GetMatchingSlot(GrowthRate.Normal, slot, slotIndex);
-                var materiaType = MateriaExt.GetMateriaType(equipped.MateriaTypeByte);
+                var materiaType = Materia.GetMateriaType(equipped.MateriaTypeByte);
 
                 return SlotImage.GetSlotImageForEquipedMateria(materiaType, fixedSlot, isDoubleLinkedSlot);
             }
@@ -263,11 +263,11 @@ namespace FF7Scarlet.Shared.Controls
 
                 var slotCheckConditions = new List<Func<bool>>
                 {
-                    (() => slotMateria == MateriaSlot.None),
-                    (() => SlotIsUnlinked(slotMateria)),
-                    (() => SlotIsLeftLinked(slotMateria)),
-                    (() => SlotIsRightLinked(slotMateria) && !isEffectiveDoubleLinked(slotIndex)),
-                    (() => isEffectiveDoubleLinked(slotIndex))
+                    () => slotMateria == MateriaSlot.None,
+                    () => SlotIsUnlinked(slotMateria),
+                    () => SlotIsLeftLinked(slotMateria),
+                    () => SlotIsRightLinked(slotMateria) && !isEffectiveDoubleLinked(slotIndex),
+                    () => isEffectiveDoubleLinked(slotIndex)
                 };
 
                 for (int itemIndex = 0; itemIndex < menuItems.Count; ++itemIndex)
@@ -606,17 +606,17 @@ namespace FF7Scarlet.Shared.Controls
         }
         private bool SlotIsUnlinked(MateriaSlot slot)
         {
-            return (slot == MateriaSlot.NormalUnlinkedSlot || slot == MateriaSlot.EmptyUnlinkedSlot);
+            return slot == MateriaSlot.NormalUnlinkedSlot || slot == MateriaSlot.EmptyUnlinkedSlot;
         }
 
         private bool SlotIsLeftLinked(MateriaSlot slot)
         {
-            return (slot == MateriaSlot.NormalLeftLinkedSlot || slot == MateriaSlot.EmptyLeftLinkedSlot);
+            return slot == MateriaSlot.NormalLeftLinkedSlot || slot == MateriaSlot.EmptyLeftLinkedSlot;
         }
 
         private bool SlotIsRightLinked(MateriaSlot slot)
         {
-            return (slot == MateriaSlot.NormalRightLinkedSlot || slot == MateriaSlot.EmptyRightLinkedSlot);
+            return slot == MateriaSlot.NormalRightLinkedSlot || slot == MateriaSlot.EmptyRightLinkedSlot;
         }
 
         private MateriaSlot GetMatchingSlot(MateriaSlot slot, int indexSlot)
