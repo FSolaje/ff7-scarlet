@@ -191,11 +191,11 @@ namespace FF7Scarlet.Shared.Controls
 
 
         // First Call to load weapon/armor slots
-        public bool SetSlots(MateriaSlot[] slots, GrowthRate growRate)
+        public bool SetSlots(MateriaSlot[] slots, GrowthRate growthRate)
         {
             bool success = true;
-            if (GrowthRate != growRate)
-                GrowthRate = growRate;
+            if (GrowthRate != growthRate)
+                GrowthRate = growthRate;
 
             for (int i = 0; i < SLOT_COUNT; ++i)
             {
@@ -205,7 +205,7 @@ namespace FF7Scarlet.Shared.Controls
             // Convert the array into a pared down version using LINQ
             // Every item is composed of the slot and its index in the original array.
             var slotsProcessedSuccessfully = slots.Select((slot, index) => new { slot, index })
-                .Where(item => SetSlotInner(item.index, item.slot, growRate, true, true, true))
+                .Where(item => SetSlotInner(item.index, item.slot, growthRate, true, true, true))
                 .ToList()
             ;
 
@@ -327,9 +327,9 @@ namespace FF7Scarlet.Shared.Controls
 
                     //attempt to update neighboring slot(s) as well
                     if (!ignoreLeft)
-                        UpdateSlotArrayInDirection(UpdateDirection.Left, slotIndex, currentValue);
+                        UpdateSlotArrayForward(UpdateDirection.Left, slotIndex, currentValue);
                     if (!ignoreRight)
-                        UpdateSlotArrayInDirection(UpdateDirection.Right, slotIndex, currentValue);
+                        UpdateSlotArrayForward(UpdateDirection.Right, slotIndex, currentValue);
 
                     InvokeDataChanged(this, EventArgs.Empty);
                     return true;
@@ -368,7 +368,7 @@ namespace FF7Scarlet.Shared.Controls
             }
         }
 
-        private void UpdateSlotArrayInDirection(UpdateDirection updateDirection, int fromSlotIndex, MateriaSlot oldRightSlotValue)
+        private void UpdateSlotArrayForward(UpdateDirection updateDirection, int fromSlotIndex, MateriaSlot oldRightSlotValue)
         {
             int slotIndex = updateDirection == UpdateDirection.Right ? fromSlotIndex + 1 : fromSlotIndex - 1;
             if (slotIndex >= 0 && slotIndex < SLOT_COUNT)
@@ -405,11 +405,11 @@ namespace FF7Scarlet.Shared.Controls
 
                 if (updateDirection == UpdateDirection.Left)
                 {
-                    UpdateSlotFromLeft(slotIndex, ignoreLeft, ignoreRight, linkState, wasDoubleLinked);
+                    UpdateSlotToLeft(slotIndex, ignoreLeft, ignoreRight, linkState, wasDoubleLinked);
                 }
                 else
                 {
-                    UpdateSlotFromRight(slotIndex, ignoreLeft, ignoreRight, linkState);
+                    UpdateSlotToRight(slotIndex, ignoreLeft, ignoreRight, linkState);
                 }
             }
         }
@@ -449,7 +449,7 @@ namespace FF7Scarlet.Shared.Controls
             return result;
         }
 
-        private void UpdateSlotFromLeft(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState, bool wasDoubleLinked)
+        private void UpdateSlotToLeft(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState, bool wasDoubleLinked)
         {
 
             if (linkState.IsRightLinked)
@@ -463,7 +463,7 @@ namespace FF7Scarlet.Shared.Controls
                 SetSlotInner(slotIndex, MateriaSlot.NormalRightLinkedSlot, growthRate, ignoreLeft, ignoreRight, true);
         }
 
-        private void UpdateSlotFromRight(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState)
+        private void UpdateSlotToRight(int slotIndex, bool ignoreLeft, bool ignoreRight, SlotLinkState linkState)
         {
             if (linkState.IsLeftLinked)
                 SetSlotInner(slotIndex, MateriaSlot.NormalLeftLinkedSlot, growthRate, ignoreLeft, ignoreRight);
