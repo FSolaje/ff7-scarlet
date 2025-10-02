@@ -1,61 +1,16 @@
-using FF7Scarlet.KernelEditor;
+﻿using FF7Scarlet.KernelEditor;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
 using System.ComponentModel;
-using System.Reflection;
 using FF7Scarlet.Shared.Models;
 
 namespace FF7Scarlet.Shared.Controls
 {
-    /// <summary>
-    /// Provides extension methods for enum types.
-    /// </summary>
-    public static class EnumExtensions
-    {
-        /// <summary>
-        /// Retrieves the description of an enum value from its <see cref="System.ComponentModel.DescriptionAttribute"/>.
-        /// </summary>
-        /// <param name="value">The enum value.</param>
-        /// <returns>The description string from the attribute, or the enum's name if the attribute is not found.</returns>
-        public static string GetDescription(this Enum value)
-        {
-            FieldInfo? field = value.GetType().GetField(value.ToString());
-            if (field == null)
-            {
-                return value.ToString();
-            }
-
-            DescriptionAttribute? attribute = (DescriptionAttribute?)field.GetCustomAttribute(typeof(DescriptionAttribute));
-
-            return attribute?.Description ?? value.ToString();
-        }
-    }
-
     public enum SlotSelectorType { Slots, Materia }
-
-
-    public enum SlotMenuValue
-    {
-        [Description("No slot")]
-        NoSlot,
-
-        [Description("Unlinked slot")]
-        Unlinked,
-
-        [Description("Left linked slot")]
-        LeftLinked,
-
-        [Description("Right linked slot")]
-        RightLinked,
-
-        [Description("Double linked slot")]
-        DoubleLinked
-    }
 
     public partial class MateriaSlotSelectorControl : UserControl
     {
-        private enum UpdateDirection { Left, Right }
         private const int SLOT_COUNT = 8;
 
         private SlotSelectorType slotSelectorType;
