@@ -7,7 +7,7 @@ namespace FF7Scarlet.Shared.Models
 	public class SlotGraphicalItem
 	{
 		public int slotIndex;
-		private MateriaSlot materiaSlot;
+		private MateriaSlot slotLinkType;
 		public MateriaType materiaType;
 		public GrowthRate growthRate;
 		private TypeSelectedForSlot lastSelectionType;
@@ -18,7 +18,7 @@ namespace FF7Scarlet.Shared.Models
 		{
 			this.slotIndex = slotIndex;
 			this.slotsArray = slotsArray;
-			materiaSlot = slotsArray[slotIndex];
+			slotLinkType = slotsArray[slotIndex];
 			this.growthRate = growthRate;
 
 			SlotGraphicalItem leftSlot = GetLeftSlot();
@@ -30,10 +30,10 @@ namespace FF7Scarlet.Shared.Models
 		}
 		public MateriaSlot MateriaSlot
 		{
-			get { return materiaSlot; }
+			get { return slotLinkType; }
 			set
 			{
-				materiaSlot = value;
+				slotLinkType = value;
 				slotsArray[slotIndex] = value;
 			}
 		}
@@ -69,7 +69,7 @@ namespace FF7Scarlet.Shared.Models
 				IsRightLinked = !isUnlinkedFromLeft && isUnlinkedFromRight;
 				IsLeftLinked = isUnlinkedFromLeft && !isUnlinkedFromRight;
 				IsDoubleLinked = !isUnlinkedFromLeft && !isUnlinkedFromRight;
-				IsNonSlot = isUnlinkedFromLeft && container.materiaSlot == MateriaSlot.None;
+				IsNonSlot = isUnlinkedFromLeft && container.slotLinkType == MateriaSlot.None;
 			}
 		}
 
@@ -98,7 +98,7 @@ namespace FF7Scarlet.Shared.Models
 			}
 			else //no materia equipped
 			{
-				return SlotImage.GetSlotImageForEmpty(materiaSlot, isDoubleLinkedSlot);
+				return SlotImage.GetSlotImageForEmpty(slotLinkType, isDoubleLinkedSlot);
 			}
 
 		}
@@ -254,7 +254,7 @@ namespace FF7Scarlet.Shared.Models
 		private bool IsUnlinkedFromRight(SlotGraphicalItem rightSlot)
 		{
 			bool result = slotIndex == rightSlot.slotIndex;
-			result |= rightSlot.materiaSlot == MateriaSlot.None;
+			result |= rightSlot.slotLinkType == MateriaSlot.None;
 			result |= rightSlot.IsLeftLinked();
 			result |= rightSlot.IsUnlinked();
 
@@ -267,7 +267,7 @@ namespace FF7Scarlet.Shared.Models
 
 
 			bool result = slotIndex == leftSlotIndex;
-			result |= leftSlot.materiaSlot == MateriaSlot.None;
+			result |= leftSlot.slotLinkType == MateriaSlot.None;
 			result |= !leftSlot.IsLeftLinked() && !leftSlot.IsDoubleLinked();
 			result |= leftSlot.IsUnlinked();
 			// result |= leftSlotHasChangeToRightLinked;
@@ -309,18 +309,18 @@ namespace FF7Scarlet.Shared.Models
 		}
 		private bool IsUnlinked()
 		{
-			return materiaSlot == MateriaSlot.NormalUnlinkedSlot || materiaSlot == MateriaSlot.EmptyUnlinkedSlot;
+			return slotLinkType == MateriaSlot.NormalUnlinkedSlot || slotLinkType == MateriaSlot.EmptyUnlinkedSlot;
 
 		}
 
 		private bool IsLeftLinked()
 		{
-			return materiaSlot == MateriaSlot.NormalLeftLinkedSlot || materiaSlot == MateriaSlot.EmptyLeftLinkedSlot;
+			return slotLinkType == MateriaSlot.NormalLeftLinkedSlot || slotLinkType == MateriaSlot.EmptyLeftLinkedSlot;
 		}
 
 		private bool IsRightLinked()
 		{
-			return materiaSlot == MateriaSlot.NormalRightLinkedSlot || materiaSlot == MateriaSlot.EmptyRightLinkedSlot;
+			return slotLinkType == MateriaSlot.NormalRightLinkedSlot || slotLinkType == MateriaSlot.EmptyRightLinkedSlot;
 		}
 
 	}
