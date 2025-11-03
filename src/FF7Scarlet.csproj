@@ -57,4 +57,8 @@
     <Folder Include="GUI\Portraits\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="FF7Scarlet.Tests" />
+  </ItemGroup>
+
 </Project>
