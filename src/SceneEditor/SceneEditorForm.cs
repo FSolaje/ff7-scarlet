@@ -1,4 +1,6 @@
-﻿using FF7Scarlet.AIEditor;
+using System.Globalization;
+using System.Media;
+using FF7Scarlet.AIEditor;
 using FF7Scarlet.Compression;
 using FF7Scarlet.Shared;
 using Shojy.FF7.Elena.Attacks;
@@ -8,7 +10,6 @@ using Shojy.FF7.Elena.Inventory;
 using System.Globalization;
 using System.Media;
 using System.Xml.Linq;
-
 namespace FF7Scarlet.SceneEditor
 {
     public partial class SceneEditorForm : Form
@@ -792,7 +793,7 @@ namespace FF7Scarlet.SceneEditor
         {
             loading = true;
             var scene = formation.Parent as Scene;
-            if (scene == null) { throw new ArgumentNullException(); }
+            ArgumentNullException.ThrowIfNull(scene);
             int i;
 
             //enemies

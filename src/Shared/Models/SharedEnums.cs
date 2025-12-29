@@ -17,14 +17,7 @@ namespace FF7Scarlet.Shared.Models
         public static string GetDescription(this Enum value)
         {
             FieldInfo? field = value.GetType().GetField(value.ToString());
-            if (field == null)
-            {
-                return value.ToString();
-            }
-
-            DescriptionAttribute? attribute = (DescriptionAttribute?)field.GetCustomAttribute(typeof(DescriptionAttribute));
-
-            return attribute?.Description ?? value.ToString();
+            return field?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? value.ToString();
         }
     }
 
