@@ -647,20 +647,18 @@ namespace FF7Scarlet.Shared.Controls
 
         private int GetSlotFromSender(object sender)
         {
-            if (sender is ToolStripMenuItem)
+            int result = -1;
+
+            if (sender is ToolStripMenuItem menuItem && menuItem.GetCurrentParent() is ContextMenuStrip toolStrip)
             {
-                var menuItem = sender as ToolStripMenuItem;
-                var toolStrip = menuItem?.GetCurrentParent() as ContextMenuStrip;
-                if (toolStrip == null) { return -1; }
-                return menuStrips.ToList().IndexOf(toolStrip);
+                result = Array.IndexOf(menuStrips, toolStrip);
             }
-            else if (sender is PictureBox)
+            else if (sender is PictureBox picture)
             {
-                var picture = sender as PictureBox;
-                if (picture == null) { return -1; }
-                return pictureBoxes.ToList().IndexOf(picture);
+                result = Array.IndexOf(pictureBoxes, picture);
             }
-            else { return -1; }
+
+            return result;
         }
 
         private void EmptySlotMenu_Clicked(object? sender, EventArgs e)
