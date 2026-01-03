@@ -113,36 +113,20 @@ namespace FF7Scarlet.Shared.Models
 
         private bool IsUnlinkedFromRight()
         {
-            bool isUnlinkedFromRight;
-            if (RightSlot == null)
-            {
-                isUnlinkedFromRight = true;
-            }
-            else
-            {
-                isUnlinkedFromRight = RightSlot.slotLinkType == MateriaSlot.None;
-                isUnlinkedFromRight |= RightSlot.slotLinkType == MateriaSlot.EmptyLeftLinkedSlot;
-                isUnlinkedFromRight |= RightSlot.slotLinkType == MateriaSlot.NormalLeftLinkedSlot;
-            }
-            return isUnlinkedFromRight;
+            return RightSlot?.slotLinkType is null 
+                or MateriaSlot.None 
+                or MateriaSlot.EmptyLeftLinkedSlot 
+                or MateriaSlot.NormalLeftLinkedSlot;
         }
 
         private bool IsUnlinkedFromLeft(UpdateDirection updateDirection = UpdateDirection.None)
         {
-            bool isUnlinkedFromLeft;
-            if (LeftSlot == null)
-            {
-                isUnlinkedFromLeft = true;
-            }
-            else
-            {
-                isUnlinkedFromLeft = LeftSlot.slotLinkType == MateriaSlot.None;
-                // result |= !LeftSlot.IsLeftLinked() && !LeftSlot.IsDoubleLinked();
-                isUnlinkedFromLeft |= LeftSlot.slotLinkType == MateriaSlot.NormalUnlinkedSlot;
-                isUnlinkedFromLeft |= LeftSlot.slotLinkType == MateriaSlot.EmptyUnlinkedSlot;
-                // result |= LeftSlot.IsUnlinked();
+            bool isUnlinkedFromLeft = LeftSlot?.slotLinkType is null 
+                or MateriaSlot.None 
+                or MateriaSlot.NormalUnlinkedSlot 
+                or MateriaSlot.EmptyUnlinkedSlot;
 
-                if (updateDirection == UpdateDirection.Right)
+            if (LeftSlot != null && updateDirection == UpdateDirection.Right)
                 {
                     bool leftSlotWasSelected = LeftSlot.SlotIndex == lastSelectionType.SlotIndex;
                     bool selectionWasRightLinked = lastSelectionType.Item == SlotMenuValue.RightLinked;
