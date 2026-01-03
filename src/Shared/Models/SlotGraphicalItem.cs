@@ -308,36 +308,21 @@ namespace FF7Scarlet.Shared.Models
 
         public bool IsDoubleLinked(MateriaSlot? newMateriaSlot = null)
         {
-            bool isDoubleLinked = false;
-
-            if (SlotIndex > 0 && SlotIndex < slotsArray.Length - 1)
-            {
-                var leftSlot = LeftSlot;
-                var rightSlot = RightSlot;
-                if (leftSlot != null && rightSlot != null)
-                {
-                    isDoubleLinked = (leftSlot.IsLeftLinked() || leftSlot.IsRightLinked()) && IsRightLinked() && rightSlot.IsRightLinked();
-                }
-            }
-
-            return isDoubleLinked;
+            return slotLinkState.IsDoubleLinked;
         }
 
         public bool IsUnlinked()
         {
-            // bool isUnlinked = slotLinkType == MateriaSlot.NormalUnlinkedSlot || slotLinkType == MateriaSlot.EmptyUnlinkedSlot;
             return slotLinkState.IsUnlinked;
         }
 
         public bool IsLeftLinked()
         {
-            // bool isLeftLinked = slotLinkType == MateriaSlot.NormalLeftLinkedSlot || slotLinkType == MateriaSlot.EmptyLeftLinkedSlot;
             return slotLinkState.IsLeftLinked;
         }
 
         public bool IsRightLinked()
         {
-            // bool isRightLinked = slotLinkType == MateriaSlot.NormalRightLinkedSlot || slotLinkType == MateriaSlot.EmptyRightLinkedSlot;
             return slotLinkState.IsRightLinked;
         }
     }
