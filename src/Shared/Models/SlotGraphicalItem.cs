@@ -1,15 +1,11 @@
-using SharpDX;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Materias;
-using FF7Scarlet.Shared.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FF7Scarlet.Shared.Models
 {
     public class SlotGraphicalItem
     {
-        private static readonly List<SlotGraphicalItem> AllSlots = new List<SlotGraphicalItem>();
+        private static readonly List<SlotGraphicalItem> AllSlots = [];
         public int SlotIndex { get; private set; }
         private MateriaSlot slotLinkType;
         public ExtendedMateriaType materiaType;
@@ -26,7 +22,7 @@ namespace FF7Scarlet.Shared.Models
             this.growthRate = growthRate;
             this.lastSelectionType = new(-1, SlotMenuValue.NoSlot, MateriaSlot.None);
             slotLinkState = new SlotLinkState(this);
-            this.materiaType = ExtendedMateriaType.None;;
+            this.materiaType = ExtendedMateriaType.None;
         }
 
         public static List<SlotGraphicalItem> CreateSlots(MateriaSlot[] slotsArray, GrowthRate growthRate)
@@ -131,7 +127,6 @@ namespace FF7Scarlet.Shared.Models
                     bool leftSlotWasSelected = LeftSlot.SlotIndex == lastSelectionType.SlotIndex;
                     bool selectionWasRightLinked = lastSelectionType.Item == SlotMenuValue.RightLinked;
                     isUnlinkedFromLeft |= leftSlotWasSelected && selectionWasRightLinked;
-                }
             }
             return isUnlinkedFromLeft;
         }
