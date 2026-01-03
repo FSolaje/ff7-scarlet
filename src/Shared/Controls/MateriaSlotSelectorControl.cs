@@ -1,9 +1,8 @@
 ﻿using FF7Scarlet.KernelEditor;
+using FF7Scarlet.Shared.Models;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Inventory;
 using Shojy.FF7.Elena.Materias;
-using System.ComponentModel;
-using FF7Scarlet.Shared.Models;
 
 namespace FF7Scarlet.Shared.Controls
 {
