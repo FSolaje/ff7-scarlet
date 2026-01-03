@@ -112,7 +112,8 @@ namespace FF7Scarlet.Shared.Models
             return RightSlot?.slotLinkType is null 
                 or MateriaSlot.None 
                 or MateriaSlot.EmptyLeftLinkedSlot 
-                or MateriaSlot.NormalLeftLinkedSlot;
+                or MateriaSlot.NormalLeftLinkedSlot
+                or MateriaSlot.NormalUnlinkedSlot; 
         }
 
         private bool IsUnlinkedFromLeft(UpdateDirection updateDirection = UpdateDirection.None)
