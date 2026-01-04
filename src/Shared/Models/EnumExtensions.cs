@@ -20,24 +20,4 @@ namespace FF7Scarlet.Shared.Models
             return field?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? value.ToString();
         }
     }
-
-    public enum SlotMenuValue
-    {
-        [Description("No slot")]
-        NoSlot,
-
-        [Description("Unlinked slot")]
-        Unlinked,
-
-        [Description("Left linked slot")]
-        LeftLinked,
-
-        [Description("Right linked slot")]
-        RightLinked,
-
-        [Description("Double linked slot")]
-        DoubleLinked
-    }
-
-    public enum UpdateDirection { None, Left, Right, Both }
 }

@@ -8,7 +8,7 @@ namespace FF7Scarlet.Shared.Models
         private static readonly List<SlotGraphicalItem> AllSlots = [];
         public int SlotIndex { get; private set; }
         private MateriaSlot slotLinkType;
-        public ExtendedMateriaType materiaType;
+        public MateriaTypeExtended materiaType;
         public GrowthRate growthRate;
         private TypeSelectedForSlot lastSelectionType;
         private readonly SlotLinkState slotLinkState;
@@ -22,7 +22,7 @@ namespace FF7Scarlet.Shared.Models
             this.growthRate = growthRate;
             this.lastSelectionType = new(-1, SlotMenuValue.NoSlot, MateriaSlot.None);
             slotLinkState = new SlotLinkState(this);
-            this.materiaType = ExtendedMateriaType.None;
+            this.materiaType = MateriaTypeExtended.None;
         }
 
         public static List<SlotGraphicalItem> CreateSlots(MateriaSlot[] slotsArray, GrowthRate growthRate)
@@ -140,14 +140,14 @@ namespace FF7Scarlet.Shared.Models
             {
                 var fixedSlot = GetMatchingSlot();
                 var materiaType = Materia.GetMateriaType(equipped.MateriaTypeByte);
-                var extendedMateriaType = materiaType.ToExtendedMateriaType(); // Using extension method
+                var materiaTypeExtended = materiaType.ToExtendedMateriaType(); // Using extension method
 
-                if (extendedMateriaType == ExtendedMateriaType.None)
+                if (materiaTypeExtended == MateriaTypeExtended.None)
                 {
                     return SlotImage.GetSlotImageForEmpty(slotLinkType, isDoubleLinkedSlot);
                 }
 
-                return SlotImage.GetSlotImageForEquippedMateria(extendedMateriaType, fixedSlot, isDoubleLinkedSlot);
+                return SlotImage.GetSlotImageForEquippedMateria(materiaTypeExtended, fixedSlot, isDoubleLinkedSlot);
             }
             else
             {

@@ -1,5 +1,6 @@
 
 using Shojy.FF7.Elena.Equipment;
+using FF7Scarlet.Shared.Models.Enums;
 
 namespace FF7Scarlet.Shared.Models
 {
