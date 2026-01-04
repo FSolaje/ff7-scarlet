@@ -1,4 +1,5 @@
 using Shojy.FF7.Elena.Equipment;
+using FF7Scarlet.Shared.Models.Enums;
 
 namespace FF7Scarlet.Shared.Models
 {
@@ -6,15 +7,15 @@ namespace FF7Scarlet.Shared.Models
     {
         private readonly static Image defaultImage = Properties.Resources.materia_slot0;
 
-        public static Image GetSlotImageForEquippedMateria(ExtendedMateriaType materiaType, MateriaSlot materiaSlot, bool isDoubleLinkedSlot = false)
+        public static Image GetSlotImageForEquippedMateria(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinkedSlot = false)
         {
-            Dictionary<ExtendedMateriaType, Func<MateriaSlot, bool, Image>> imageDictionary = new()
+            Dictionary<MateriaTypeExtended, Func<MateriaSlot, bool, Image>> imageDictionary = new()
             {
-                { ExtendedMateriaType.Command, GetCommandMateriaImageFor },
-                { ExtendedMateriaType.Magic, GetMagicMateriaImageFor },
-                { ExtendedMateriaType.Summon, GetMagicSummonImageFor },
-                { ExtendedMateriaType.Support, GetMagicSupportImageFor },
-                { ExtendedMateriaType.Independent, GetIndependentMateriaImageFor }
+                { MateriaTypeExtended.Command, GetCommandMateriaImageFor },
+                { MateriaTypeExtended.Magic, GetMagicMateriaImageFor },
+                { MateriaTypeExtended.Summon, GetMagicSummonImageFor },
+                { MateriaTypeExtended.Support, GetMagicSupportImageFor },
+                { MateriaTypeExtended.Independent, GetIndependentMateriaImageFor }
             };
 
             return imageDictionary[materiaType].Invoke(materiaSlot, isDoubleLinkedSlot);

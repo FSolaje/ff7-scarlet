@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Reflection;
 using FF7Scarlet.Properties;
 using FF7Scarlet.Shared.Models;
+using FF7Scarlet.Shared.Models.Enums;
 using Shojy.FF7.Elena.Equipment;
 using Shojy.FF7.Elena.Materias;
 

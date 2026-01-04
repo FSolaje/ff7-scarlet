@@ -1,6 +1,6 @@
-namespace FF7Scarlet.Shared.Models
+namespace FF7Scarlet.Shared.Models.Enums
 {
-    public enum ExtendedMateriaType
+    public enum MateriaTypeExtended
     {
         None = -1, // A new 'None' value for FF7Scarlet's internal use
         Command = 1,

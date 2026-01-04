@@ -1,5 +1,6 @@
 
 using FF7Scarlet.Shared.Models;
+using FF7Scarlet.Shared.Models.Enums;
 using Shojy.FF7.Elena.Equipment;
 using FF7Scarlet.Properties;
 using System.Drawing;
@@ -29,27 +30,27 @@ namespace FF7Scarlet.Tests
         }
 
         [Test]
-        [TestCase(ExtendedMateriaType.Command, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_command1")]
-        [TestCase(ExtendedMateriaType.Command, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_command2")]
-        [TestCase(ExtendedMateriaType.Command, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_command3")]
-        [TestCase(ExtendedMateriaType.Command, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_command_dl")]
-        [TestCase(ExtendedMateriaType.Magic, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_magic1")]
-        [TestCase(ExtendedMateriaType.Magic, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_magic2")]
-        [TestCase(ExtendedMateriaType.Magic, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_magic3")]
-        [TestCase(ExtendedMateriaType.Magic, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_magic_dl")]
-        [TestCase(ExtendedMateriaType.Summon, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_summon1")]
-        [TestCase(ExtendedMateriaType.Summon, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_summon2")]
-        [TestCase(ExtendedMateriaType.Summon, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_summon3")]
-        [TestCase(ExtendedMateriaType.Summon, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_summon_dl")]
-        [TestCase(ExtendedMateriaType.Support, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_support1")]
-        [TestCase(ExtendedMateriaType.Support, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_support2")]
-        [TestCase(ExtendedMateriaType.Support, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_support3")]
-        [TestCase(ExtendedMateriaType.Support, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_support_dl")]
-        [TestCase(ExtendedMateriaType.Independent, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_independent1")]
-        [TestCase(ExtendedMateriaType.Independent, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_independent2")]
-        [TestCase(ExtendedMateriaType.Independent, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_independent3")]
-        [TestCase(ExtendedMateriaType.Independent, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_independent_dl")]
-        public void GetSlotImageForEquippedMateriaTest(ExtendedMateriaType materiaType, MateriaSlot materiaSlot, bool isDoubleLinked, string expected)
+        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_command1")]
+        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_command2")]
+        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_command3")]
+        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_command_dl")]
+        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_magic1")]
+        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_magic2")]
+        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_magic3")]
+        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_magic_dl")]
+        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_summon1")]
+        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_summon2")]
+        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_summon3")]
+        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_summon_dl")]
+        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_support1")]
+        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_support2")]
+        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_support3")]
+        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_support_dl")]
+        [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalUnlinkedSlot, false, "materia_slot_independent1")]
+        [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalLeftLinkedSlot, false, "materia_slot_independent2")]
+        [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalRightLinkedSlot, false, "materia_slot_independent3")]
+        [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalRightLinkedSlot, true, "materia_slot_independent_dl")]
+        public void GetSlotImageForEquippedMateriaTest(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinked, string expected)
         {
             var resourceObject = Resources.ResourceManager.GetObject(expected);
             Assert.That(resourceObject, Is.Not.Null, $"Resource '{expected}' not found");
