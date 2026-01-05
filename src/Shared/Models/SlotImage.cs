@@ -5,11 +5,11 @@ namespace FF7Scarlet.Shared.Models
 {
     public class SlotImage
     {
-        private readonly static Image defaultImage = Properties.Resources.materia_slot0;
+        private readonly static MateriaSlotResource defaultResource = MateriaSlotResource.materia_slot0;
 
         public static Image GetSlotImageForEquippedMateria(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinkedSlot = false)
         {
-            Dictionary<MateriaTypeExtended, Func<MateriaSlot, bool, Image>> imageDictionary = new()
+            Dictionary<MateriaTypeExtended, Func<MateriaSlot, bool, MateriaSlotResource>> resourceDictionary = new()
             {
                 { MateriaTypeExtended.Command, GetCommandMateriaImageFor },
                 { MateriaTypeExtended.Magic, GetMagicMateriaImageFor },
@@ -18,124 +18,111 @@ namespace FF7Scarlet.Shared.Models
                 { MateriaTypeExtended.Independent, GetIndependentMateriaImageFor }
             };
 
-            return imageDictionary[materiaType].Invoke(materiaSlot, isDoubleLinkedSlot);
+            var resourceName = resourceDictionary[materiaType].Invoke(materiaSlot, isDoubleLinkedSlot);
+            return (Image)Properties.Resources.ResourceManager.GetObject(resourceName.ToString())!;
         }
 
         public static Image GetSlotImageForEmpty(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-            Image emptyRightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_dl2
-                : Properties.Resources.materia_slot6;
+            MateriaSlotResource emptyRightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_dl2
+                : MateriaSlotResource.materia_slot6;
 
-            Image normalRightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_dl1
-                : Properties.Resources.materia_slot3;
+            MateriaSlotResource normalRightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_dl1
+                : MateriaSlotResource.materia_slot3;
 
-            Dictionary<MateriaSlot, Image> imageDictionary = new()
+            Dictionary<MateriaSlot, MateriaSlotResource> nameDictionary = new()
             {
-                { MateriaSlot.None, Properties.Resources.materia_slot0 },
-                { MateriaSlot.NormalUnlinkedSlot, Properties.Resources.materia_slot1 },
-                { MateriaSlot.NormalLeftLinkedSlot, Properties.Resources.materia_slot2 },
+                { MateriaSlot.None, MateriaSlotResource.materia_slot0 },
+                { MateriaSlot.NormalUnlinkedSlot, MateriaSlotResource.materia_slot1 },
+                { MateriaSlot.NormalLeftLinkedSlot, MateriaSlotResource.materia_slot2 },
                 { MateriaSlot.NormalRightLinkedSlot, normalRightLinkedImage },
-                { MateriaSlot.EmptyUnlinkedSlot, Properties.Resources.materia_slot4 },
-                { MateriaSlot.EmptyLeftLinkedSlot, Properties.Resources.materia_slot5 },
+                { MateriaSlot.EmptyUnlinkedSlot, MateriaSlotResource.materia_slot4 },
+                { MateriaSlot.EmptyLeftLinkedSlot, MateriaSlotResource.materia_slot5 },
                 { MateriaSlot.EmptyRightLinkedSlot, emptyRightLinkedImage }
             };
 
-            return imageDictionary[materiaSlot];
+            var resourceName = nameDictionary[materiaSlot];
+            return (Image)Properties.Resources.ResourceManager.GetObject(resourceName.ToString())!;
         }
 
-        private static Image GetCommandMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
+        private static MateriaSlotResource GetCommandMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-			Image image;
-            Image rightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_command_dl
-                : Properties.Resources.materia_slot_command3;
+            MateriaSlotResource rightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_command_dl
+                : MateriaSlotResource.materia_slot_command3;
 
-            Dictionary<MateriaSlot, Image> materiaImages = new()
+            Dictionary<MateriaSlot, MateriaSlotResource> materiaImages = new()
             {
-                { MateriaSlot.NormalUnlinkedSlot, Properties.Resources.materia_slot_command1 },
-                { MateriaSlot.NormalLeftLinkedSlot, Properties.Resources.materia_slot_command2 },
+                { MateriaSlot.NormalUnlinkedSlot, MateriaSlotResource.materia_slot_command1 },
+                { MateriaSlot.NormalLeftLinkedSlot, MateriaSlotResource.materia_slot_command2 },
                 { MateriaSlot.NormalRightLinkedSlot, rightLinkedImage },
             };
 
-            image = materiaImages.TryGetValue(materiaSlot, out Image? result) ?  result : defaultImage;
-
-            return image;
+            return materiaImages.TryGetValue(materiaSlot, out MateriaSlotResource result) ? result : defaultResource;
         }
 
-        private static Image GetMagicMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
+        private static MateriaSlotResource GetMagicMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-			Image image;
-            Image rightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_magic_dl
-                : Properties.Resources.materia_slot_magic3;
-            Dictionary<MateriaSlot, Image> materiaImages = new()
+            MateriaSlotResource rightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_magic_dl
+                : MateriaSlotResource.materia_slot_magic3;
+            Dictionary<MateriaSlot, MateriaSlotResource> materiaImages = new()
             {
-                { MateriaSlot.NormalUnlinkedSlot, Properties.Resources.materia_slot_magic1 },
-                { MateriaSlot.NormalLeftLinkedSlot, Properties.Resources.materia_slot_magic2 },
+                { MateriaSlot.NormalUnlinkedSlot, MateriaSlotResource.materia_slot_magic1 },
+                { MateriaSlot.NormalLeftLinkedSlot, MateriaSlotResource.materia_slot_magic2 },
                 { MateriaSlot.NormalRightLinkedSlot, rightLinkedImage },
             };
 
-            image = materiaImages.TryGetValue(materiaSlot, out Image? result) ?  result : defaultImage;
-
-            return image;
+            return materiaImages.TryGetValue(materiaSlot, out MateriaSlotResource result) ? result : defaultResource;
         }
 
-        private static Image GetMagicSummonImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
+        private static MateriaSlotResource GetMagicSummonImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-			Image image;
-            Image rightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_summon_dl
-                : Properties.Resources.materia_slot_summon3;
-            Dictionary<MateriaSlot, Image> materiaImages = new()
+            MateriaSlotResource rightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_summon_dl
+                : MateriaSlotResource.materia_slot_summon3;
+            Dictionary<MateriaSlot, MateriaSlotResource> materiaImages = new()
             {
-                { MateriaSlot.NormalUnlinkedSlot, Properties.Resources.materia_slot_summon1 },
-                { MateriaSlot.NormalLeftLinkedSlot, Properties.Resources.materia_slot_summon2 },
+                { MateriaSlot.NormalUnlinkedSlot, MateriaSlotResource.materia_slot_summon1 },
+                { MateriaSlot.NormalLeftLinkedSlot, MateriaSlotResource.materia_slot_summon2 },
                 { MateriaSlot.NormalRightLinkedSlot, rightLinkedImage },
             };
 
-            image = materiaImages.TryGetValue(materiaSlot, out Image? result) ?  result : defaultImage;
-
-            return image;
+            return materiaImages.TryGetValue(materiaSlot, out MateriaSlotResource result) ? result : defaultResource;
         }
 
-        private static Image GetMagicSupportImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
+        private static MateriaSlotResource GetMagicSupportImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-			Image image;
-            Image rightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_support_dl
-                : Properties.Resources.materia_slot_support3;
+            MateriaSlotResource rightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_support_dl
+                : MateriaSlotResource.materia_slot_support3;
 
-            Dictionary<MateriaSlot, Image> materiaImages = new()
+            Dictionary<MateriaSlot, MateriaSlotResource> materiaImages = new()
             {
-                { MateriaSlot.NormalUnlinkedSlot, Properties.Resources.materia_slot_support1 },
-                { MateriaSlot.NormalLeftLinkedSlot, Properties.Resources.materia_slot_support2 },
+                { MateriaSlot.NormalUnlinkedSlot, MateriaSlotResource.materia_slot_support1 },
+                { MateriaSlot.NormalLeftLinkedSlot, MateriaSlotResource.materia_slot_support2 },
                 { MateriaSlot.NormalRightLinkedSlot, rightLinkedImage},
             };
 
-            image = materiaImages.TryGetValue(materiaSlot, out Image? result) ?  result : defaultImage;
-
-            return image;
+            return materiaImages.TryGetValue(materiaSlot, out MateriaSlotResource result) ? result : defaultResource;
         }
 
-        private static Image GetIndependentMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
+        private static MateriaSlotResource GetIndependentMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-			Image image;
-            Image rightLinkedImage = isDoubleLinked ?
-                Properties.Resources.materia_slot_independent_dl
-                : Properties.Resources.materia_slot_independent3;
+            MateriaSlotResource rightLinkedImage = isDoubleLinked ?
+                MateriaSlotResource.materia_slot_independent_dl
+                : MateriaSlotResource.materia_slot_independent3;
 
-            Dictionary<MateriaSlot, Image> materiaImages = new()
+            Dictionary<MateriaSlot, MateriaSlotResource> materiaImages = new()
             {
-                { MateriaSlot.NormalUnlinkedSlot, Properties.Resources.materia_slot_independent1 },
-                { MateriaSlot.NormalLeftLinkedSlot, Properties.Resources.materia_slot_independent2 },
+                { MateriaSlot.NormalUnlinkedSlot, MateriaSlotResource.materia_slot_independent1 },
+                { MateriaSlot.NormalLeftLinkedSlot, MateriaSlotResource.materia_slot_independent2 },
                 { MateriaSlot.NormalRightLinkedSlot, rightLinkedImage},
             };
 
-            image = materiaImages.TryGetValue(materiaSlot, out Image? result) ?  result : defaultImage;
-
-            return image;
+            return materiaImages.TryGetValue(materiaSlot, out MateriaSlotResource result) ? result : defaultResource;
         }
     }
 }

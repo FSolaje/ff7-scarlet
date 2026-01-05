@@ -18,6 +18,7 @@ namespace FF7Scarlet.Tests
         [Test]
         public void CreateSlots_CreatesInstances_WithoutThrowing()
         {
+            bool isMultiLinkedEnabled = true;
             // Arrange
             var slots = new MateriaSlot[8];
 
@@ -25,7 +26,7 @@ namespace FF7Scarlet.Tests
 
             Assert.DoesNotThrow(() =>
             {
-                var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+                var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal, isMultiLinkedEnabled);
             });
         }
 
@@ -33,19 +34,20 @@ namespace FF7Scarlet.Tests
         public void CreateSlots_InitializesPropertiesCorrectly()
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
             slots[0] = MateriaSlot.NormalLeftLinkedSlot;
             var growth = GrowthRate.Normal;
 
             // Act
-            var items = SlotGraphicalItem.CreateSlots(slots, growth);
+            var items = SlotGraphicalItem.CreateSlots(slots, growth, isMultiLinkedEnabled);
             var item = items[0];
 
             // Assert
             Assert.Multiple(() =>
             {
                 Assert.That(item.SlotIndex, Is.EqualTo(0));
-                Assert.That(item.MateriaSlot, Is.EqualTo(MateriaSlot.NormalLeftLinkedSlot));
+                Assert.That(item.MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalLeftLinkedSlot));
                 Assert.That(item.growthRate, Is.EqualTo(growth));
             });
         }
@@ -54,8 +56,9 @@ namespace FF7Scarlet.Tests
         public void GetMatchingImage_WithEquippedMateria_ReturnsImage()
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal, isMultiLinkedEnabled);
             var item = items[1];
             var materia = new Materia { MateriaTypeByte = (byte)MateriaType.Command };
 
@@ -70,8 +73,9 @@ namespace FF7Scarlet.Tests
         public void GetMatchingImage_WithoutEquippedMateria_ReturnsImage()
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal,isMultiLinkedEnabled);
             var item = items[1];
 
             // Act
@@ -81,26 +85,18 @@ namespace FF7Scarlet.Tests
             Assert.That(image, Is.Not.Null);
         }
 
-        private static object GetSlotState(SlotGraphicalItem item)
-        {
-            var slotStateField = typeof(SlotGraphicalItem).GetField("slotLinkState", BindingFlags.NonPublic | BindingFlags.Instance)
-                ?? throw new InvalidOperationException("Field 'slotLinkState' not found in SlotGraphicalItem.");
-
-            return slotStateField.GetValue(item) ?? throw new InvalidOperationException("Field 'slotLinkState' is null.");
-        }
-
         [Test]
         public void Linking_ForFirstSlot_WhenUnlinked_IsUnlinked()
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
             slots[0] = MateriaSlot.NormalUnlinkedSlot;
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal, isMultiLinkedEnabled);
             var firstSlot = items[0];
 
             // Act
-            var slotState = GetSlotState(firstSlot);
-            var isUnlinked = (bool)slotState.GetType().GetProperty("IsUnlinked")!.GetValue(slotState)!;
+            var isUnlinked = firstSlot.IsUnlinked();
 
             // Assert
             Assert.That(isUnlinked, Is.True);
@@ -111,15 +107,15 @@ namespace FF7Scarlet.Tests
         public void Linking_ForFirstSlot_WhenPaired_IsLeftLinked(MateriaSlot secondSlotType, bool expectedIsLeftLinked)
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
             slots[0] = MateriaSlot.NormalLeftLinkedSlot;
             slots[1] = secondSlotType;
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal,isMultiLinkedEnabled);
             var firstSlot = items[0];
 
             // Act
-            var slotState = GetSlotState(firstSlot);
-            var isLeftLinked = (bool)slotState.GetType().GetProperty("IsLeftLinked")!.GetValue(slotState)!;
+            var isLeftLinked = firstSlot.IsLeftLinked();
 
             // Assert
             Assert.That(isLeftLinked, Is.EqualTo(expectedIsLeftLinked));
@@ -129,16 +125,16 @@ namespace FF7Scarlet.Tests
         public void Linking_ForMiddleSlot_IsDoubleLinked()
         {
             // Arrange: LL -> RL -> RL chain
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
             slots[0] = MateriaSlot.NormalLeftLinkedSlot; // User def: links right
             slots[1] = MateriaSlot.NormalRightLinkedSlot; // User def: links left
             slots[2] = MateriaSlot.NormalRightLinkedSlot; // User def: links left
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal,isMultiLinkedEnabled);
             var middleSlot = items[1];
 
             // Act
-            var slotState = GetSlotState(middleSlot);
-            var isDoubleLinked = (bool)slotState.GetType().GetProperty("IsDoubleLinked")!.GetValue(slotState)!;
+            var isDoubleLinked = middleSlot.IsDoubleLinked();
 
             // Assert
             Assert.That(isDoubleLinked, Is.True);
@@ -148,14 +144,14 @@ namespace FF7Scarlet.Tests
         public void Linking_ForLastSlot_WhenUnlinked_IsUnlinked()
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
             slots[7] = MateriaSlot.NormalUnlinkedSlot;
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal, isMultiLinkedEnabled);
             var lastSlot = items[7];
 
             // Act
-            var slotState = GetSlotState(lastSlot);
-            var isUnlinked = (bool)slotState.GetType().GetProperty("IsUnlinked")!.GetValue(slotState)!;
+            var isUnlinked = lastSlot.IsUnlinked();
 
             // Assert
             Assert.That(isUnlinked, Is.True);
@@ -165,15 +161,15 @@ namespace FF7Scarlet.Tests
         public void Linking_ForLastSlot_WhenPaired_IsRightLinked()
         {
             // Arrange
+            bool isMultiLinkedEnabled = true;
             var slots = new MateriaSlot[8];
             slots[6] = MateriaSlot.NormalLeftLinkedSlot;
             slots[7] = MateriaSlot.NormalRightLinkedSlot;
-            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal);
+            var items = SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal,isMultiLinkedEnabled);
             var lastSlot = items[7];
 
             // Act
-            var slotState = GetSlotState(lastSlot);
-            var isRightLinked = (bool)slotState.GetType().GetProperty("IsRightLinked")!.GetValue(slotState)!;
+            var isRightLinked = lastSlot.IsRightLinked();
 
             // Assert
             Assert.That(isRightLinked, Is.True);
@@ -196,30 +192,31 @@ namespace FF7Scarlet.Tests
             ];
             GrowthRate growthRate = GrowthRate.Normal;
 
-            string[] expectedImageNames =
+            MateriaSlotResource[] expectedResources =
             [
-                "materia_slot1",
-                "materia_slot1",
-                "materia_slot1",
-                "materia_slot1",
-                "materia_slot2",
-                "materia_slot_dl1",
-                "materia_slot_dl1",
-                "materia_slot3"
+                MateriaSlotResource.materia_slot1,
+                MateriaSlotResource.materia_slot1,
+                MateriaSlotResource.materia_slot1,
+                MateriaSlotResource.materia_slot1,
+                MateriaSlotResource.materia_slot2,
+                MateriaSlotResource.materia_slot_dl1,
+                MateriaSlotResource.materia_slot_dl1,
+                MateriaSlotResource.materia_slot3
             ];
 
             // Act
-            List<SlotGraphicalItem> graphicalSlots = SlotGraphicalItem.CreateSlots(slots, growthRate);
+            bool isMultiLinkedEnabled = true;
+            List<SlotGraphicalItem> graphicalSlots = SlotGraphicalItem.CreateSlots(slots, growthRate,isMultiLinkedEnabled);
 
             // Assert
             for (int i = 0; i < graphicalSlots.Count; i++)
             {
                 Image actualImage = graphicalSlots[i].GetMatchingImage();
-                var resourceObject = Resources.ResourceManager.GetObject(expectedImageNames[i]);
-                Assert.That(resourceObject, Is.Not.Null, $"Resource '{expectedImageNames[i]}' not found");
+                var resourceObject = Resources.ResourceManager.GetObject(expectedResources[i].ToString());
+                Assert.That(resourceObject, Is.Not.Null, $"Resource '{expectedResources[i]}' not found");
                 Image expectedImage = (Image)resourceObject;
                 Assert.That(GetImageHash(actualImage), Is.EqualTo(GetImageHash(expectedImage)),
-                    $"Image mismatch at index {i}. Expected {expectedImageNames[i]}");
+                    $"Image mismatch at index {i}. Expected {expectedResources[i]}");
             }
         }
     }
