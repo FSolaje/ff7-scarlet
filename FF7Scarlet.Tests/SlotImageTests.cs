@@ -10,6 +10,19 @@ namespace FF7Scarlet.Tests
     public class SlotImageTests : ImageTestBase
     {
         [Test]
+        [TestCase(MateriaSlotResource.materia_slot0)]
+        [TestCase(MateriaSlotResource.materia_slot_command1)]
+        public void GetImageFromResourceTest(MateriaSlotResource resource)
+        {
+            var resourceName = resource.ToString();
+            var image = SlotImage.GetImageFromResource(resourceName);
+            
+            var expectedObject = Resources.ResourceManager.GetObject(resourceName);
+            Assert.That(image, Is.Not.Null);
+            Assert.That(GetImageHash(image), Is.EqualTo(GetImageHash((Image)expectedObject!)));
+        }
+
+        [Test]
         [TestCase(MateriaSlot.None, false, MateriaSlotResource.materia_slot0)]
         [TestCase(MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot1)]
         [TestCase(MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot2)]
@@ -19,13 +32,10 @@ namespace FF7Scarlet.Tests
         [TestCase(MateriaSlot.EmptyRightLinkedSlot, false, MateriaSlotResource.materia_slot6)]
         [TestCase(MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_dl1)]
         [TestCase(MateriaSlot.EmptyRightLinkedSlot, true, MateriaSlotResource.materia_slot_dl2)]
-        public void GetSlotImageForEmptyTest(MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
+        public void GetSlotResourceForEmptyTest(MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
         {
-            var resourceObject = Resources.ResourceManager.GetObject(expected.ToString());
-            Assert.That(resourceObject, Is.Not.Null, $"Resource '{expected}' not found");
-            var expectedImage = (Image)resourceObject;
-            var actualImage = SlotImage.GetSlotImageForEmpty(materiaSlot, isDoubleLinked);
-            Assert.That(GetImageHash(actualImage), Is.EqualTo(GetImageHash(expectedImage)));
+            var actualResource = SlotImage.GetSlotResourceForEmpty(materiaSlot, isDoubleLinked);
+            Assert.That(actualResource, Is.EqualTo(expected));
         }
 
         [Test]
@@ -49,13 +59,10 @@ namespace FF7Scarlet.Tests
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_independent2)]
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_independent3)]
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_independent_dl)]
-        public void GetSlotImageForEquippedMateriaTest(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
+        public void GetSlotResourceForEquippedMateriaTest(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
         {
-            var resourceObject = Resources.ResourceManager.GetObject(expected.ToString());
-            Assert.That(resourceObject, Is.Not.Null, $"Resource '{expected}' not found");
-            var expectedImage = (Image)resourceObject;
-            var actualImage = SlotImage.GetSlotImageForEquippedMateria(materiaType, materiaSlot, isDoubleLinked);
-            Assert.That(GetImageHash(actualImage), Is.EqualTo(GetImageHash(expectedImage)));
+            var actualResource = SlotImage.GetSlotResourceForEquippedMateria(materiaType, materiaSlot, isDoubleLinked);
+            Assert.That(actualResource, Is.EqualTo(expected));
         }
     }
 }

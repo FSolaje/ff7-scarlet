@@ -176,7 +176,7 @@ namespace FF7Scarlet.Tests
         }
 
         [Test]
-        public void CreateSlotsAndGetMatchingImageTest()
+        public void CreateSlotsAndGetMatchingResourceTest()
         {
             // Arrange
             MateriaSlot[] slots =
@@ -211,12 +211,9 @@ namespace FF7Scarlet.Tests
             // Assert
             for (int i = 0; i < graphicalSlots.Count; i++)
             {
-                Image actualImage = graphicalSlots[i].GetMatchingImage();
-                var resourceObject = Resources.ResourceManager.GetObject(expectedResources[i].ToString());
-                Assert.That(resourceObject, Is.Not.Null, $"Resource '{expectedResources[i]}' not found");
-                Image expectedImage = (Image)resourceObject;
-                Assert.That(GetImageHash(actualImage), Is.EqualTo(GetImageHash(expectedImage)),
-                    $"Image mismatch at index {i}. Expected {expectedResources[i]}");
+                var actualResource = graphicalSlots[i].GetMatchingResource();
+                Assert.That(actualResource, Is.EqualTo(expectedResources[i]), 
+                    $"Resource mismatch at index {i}");
             }
         }
     }

@@ -7,22 +7,13 @@ namespace FF7Scarlet.Shared.Models
     {
         private readonly static MateriaSlotResource defaultResource = MateriaSlotResource.materia_slot0;
 
-        public static Image GetSlotImageForEquippedMateria(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinkedSlot = false)
+        public static Image GetSlotImageForEmpty(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
-            Dictionary<MateriaTypeExtended, Func<MateriaSlot, bool, MateriaSlotResource>> resourceDictionary = new()
-            {
-                { MateriaTypeExtended.Command, GetCommandMateriaImageFor },
-                { MateriaTypeExtended.Magic, GetMagicMateriaImageFor },
-                { MateriaTypeExtended.Summon, GetMagicSummonImageFor },
-                { MateriaTypeExtended.Support, GetMagicSupportImageFor },
-                { MateriaTypeExtended.Independent, GetIndependentMateriaImageFor }
-            };
-
-            var resourceName = resourceDictionary[materiaType].Invoke(materiaSlot, isDoubleLinkedSlot);
-            return (Image)Properties.Resources.ResourceManager.GetObject(resourceName.ToString())!;
+            var resource = GetSlotResourceForEmpty(materiaSlot, isDoubleLinked);
+            return GetImageFromResource(resource.ToString());
         }
 
-        public static Image GetSlotImageForEmpty(MateriaSlot materiaSlot, bool isDoubleLinked)
+        public static MateriaSlotResource GetSlotResourceForEmpty(MateriaSlot materiaSlot, bool isDoubleLinked)
         {
             MateriaSlotResource emptyRightLinkedImage = isDoubleLinked ?
                 MateriaSlotResource.materia_slot_dl2
@@ -43,8 +34,27 @@ namespace FF7Scarlet.Shared.Models
                 { MateriaSlot.EmptyRightLinkedSlot, emptyRightLinkedImage }
             };
 
-            var resourceName = nameDictionary[materiaSlot];
-            return (Image)Properties.Resources.ResourceManager.GetObject(resourceName.ToString())!;
+            return nameDictionary[materiaSlot];
+        }
+
+        public static Image GetSlotImageForEquippedMateria(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinkedSlot = false)
+        {
+            var resource = GetSlotResourceForEquippedMateria(materiaType, materiaSlot, isDoubleLinkedSlot);
+            return GetImageFromResource(resource.ToString());
+        }
+
+        public static MateriaSlotResource GetSlotResourceForEquippedMateria(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinkedSlot = false)
+        {
+            Dictionary<MateriaTypeExtended, Func<MateriaSlot, bool, MateriaSlotResource>> resourceDictionary = new()
+            {
+                { MateriaTypeExtended.Command, GetCommandMateriaImageFor },
+                { MateriaTypeExtended.Magic, GetMagicMateriaImageFor },
+                { MateriaTypeExtended.Summon, GetMagicSummonImageFor },
+                { MateriaTypeExtended.Support, GetMagicSupportImageFor },
+                { MateriaTypeExtended.Independent, GetIndependentMateriaImageFor }
+            };
+
+            return resourceDictionary[materiaType].Invoke(materiaSlot, isDoubleLinkedSlot);
         }
 
         private static MateriaSlotResource GetCommandMateriaImageFor(MateriaSlot materiaSlot, bool isDoubleLinked)
@@ -124,5 +134,11 @@ namespace FF7Scarlet.Shared.Models
 
             return materiaImages.TryGetValue(materiaSlot, out MateriaSlotResource result) ? result : defaultResource;
         }
+
+        public static Image GetImageFromResource(string resourceName)
+        {
+            return (Image)Properties.Resources.ResourceManager.GetObject(resourceName)!;
+        }
+
     }
 }
