@@ -48,7 +48,7 @@ namespace FF7Scarlet.Tests
             {
                 Assert.That(item.SlotIndex, Is.EqualTo(0));
                 Assert.That(item.MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalLeftLinkedSlot));
-                Assert.That(item.growthRate, Is.EqualTo(growth));
+                Assert.That(SlotGraphicalItem.GrowthRate, Is.EqualTo(growth));
             });
         }
 
