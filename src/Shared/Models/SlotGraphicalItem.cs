@@ -12,6 +12,11 @@ namespace FF7Scarlet.Shared.Models
         private static TypeSelectedForSlot lastSelectionType = new();
         public static GrowthRate GrowthRate {get; set;}
 
+        static SlotGraphicalItem()
+        {
+            lastSelectionType = new(-1, SlotMenuValue.NoSlot, MateriaSlot.None);
+        }
+
         public int SlotIndex { get; private set; }
         public MateriaTypeExtended materiaType;
 
@@ -24,8 +29,8 @@ namespace FF7Scarlet.Shared.Models
 
         private SlotGraphicalItem(int slotIndex, MateriaSlot[] slotsArray, GrowthRate growthRate, bool isMultiLinkedEnabled)
         {
-			this.SlotIndex = slotIndex;
-			SlotGraphicalItem.SlotsArray = slotsArray;
+            this.SlotIndex = slotIndex;
+            SlotGraphicalItem.SlotsArray = slotsArray;
             this.MateriaSlotValue = slotsArray[slotIndex];
             SlotGraphicalItem.GrowthRate = growthRate;
             SlotGraphicalItem.isMultilinkedEnabled = isMultiLinkedEnabled;
@@ -56,7 +61,7 @@ namespace FF7Scarlet.Shared.Models
             }
             set
             {
-                if (SlotIndex > 0 && SlotIndex < SlotsArray.Length)
+                if (SlotIndex >= 0 && SlotIndex < SlotsArray.Length)
                     SlotsArray[SlotIndex] = value;
             }
         }
@@ -65,13 +70,10 @@ namespace FF7Scarlet.Shared.Models
         {
             get
             {
-                SlotGraphicalItem leftSlot;
                 if (SlotIndex > 0)
-                    leftSlot = AllSlots[SlotIndex - 1];
+                    return AllSlots[SlotIndex - 1];
                 else
-                    leftSlot = new SlotGraphicalItem(SlotsArray);
-
-                return leftSlot;
+                    return new SlotGraphicalItem(SlotsArray);
             }
         }
 
@@ -79,16 +81,11 @@ namespace FF7Scarlet.Shared.Models
         {
             get
             {
-                SlotGraphicalItem rightSlot;
                 if (SlotIndex < AllSlots.Count - 1)
-                    rightSlot = AllSlots[SlotIndex + 1];
+                    return AllSlots[SlotIndex + 1];
                 else
-                    rightSlot = new SlotGraphicalItem(SlotsArray);
-
-                return rightSlot;
-
+                    return new SlotGraphicalItem(SlotsArray);
             }
-
         }
 
         public MateriaSlotResource GetMatchingResource(Materia? equipped = null)
@@ -141,7 +138,9 @@ namespace FF7Scarlet.Shared.Models
 
         public bool SetInSlot(MateriaSlot newMateriaSlot, TypeSelectedForSlot slotClickedInSelectorType, UpdateDirection updateDirection, bool forceUpdate = false)
         {
+            bool result = false;
             lastSelectionType = slotClickedInSelectorType;
+            
             if (SlotIndex >= 0 && SlotIndex < SlotsArray.Length)
             {
                 if(IsADoubleLinkedClickedSlot())
@@ -149,9 +148,8 @@ namespace FF7Scarlet.Shared.Models
 
                 var materiaSlotValueFixed = GetMatchingSlot(newMateriaSlot);
 
-                if (MateriaSlotValue != newMateriaSlot || forceUpdate)
+                if (MateriaSlotValue != materiaSlotValueFixed || forceUpdate)
                 {
-                    var currentValue = MateriaSlotValue;
                     MateriaSlotValue = materiaSlotValueFixed;
 
                     if (updateDirection == UpdateDirection.Left || updateDirection == UpdateDirection.Both)
@@ -160,66 +158,73 @@ namespace FF7Scarlet.Shared.Models
                     if (updateDirection == UpdateDirection.Right || updateDirection == UpdateDirection.Both)
                         UpdateRightSlot();
 
-                    return true;
+                    result = true;
                 }
             }
-            return false;
+            return result;
         }
 
         private void UpdateLeftSlot()
         {
-
-            if (IsLeftLinked())
+            // [SLOT-NAT-L-01] & [SLOT-ML-L-01]: Break left link
+            if (IsLeftLinked() || IsUnlinked() || IsNonSlot())
             {
                 if (LeftSlot.IsLeftLinked())
-                    LeftSlot.SetInSlot(MateriaSlot.EmptyUnlinkedSlot, lastSelectionType, UpdateDirection.Left);
+                {
+                    LeftSlot.SetInSlot(MateriaSlot.NormalUnlinkedSlot, lastSelectionType, UpdateDirection.Left);
+                }
             }
-
+            // [SLOT-NAT-L-02] & [SLOT-ML-L-02]: Create left link (Auto-link)
             else if (IsRightLinked())
             {
                 if (LeftSlot.IsUnlinked() || LeftSlot.IsNonSlot())
-                    LeftSlot.SetInSlot(MateriaSlot.EmptyLeftLinkedSlot, lastSelectionType, UpdateDirection.Left);
-
+                {
+                    LeftSlot.SetInSlot(MateriaSlot.NormalLeftLinkedSlot, lastSelectionType, UpdateDirection.Left);
+                }
             }
-
-            else if (IsUnlinked() || IsNonSlot())
-            {
-                if (LeftSlot.IsLeftLinked())
-                    LeftSlot.SetInSlot(MateriaSlot.EmptyUnlinkedSlot, lastSelectionType, UpdateDirection.Left);
-
-            }
-
         }
 
         private void UpdateRightSlot()
         {
-            if (IsLeftLinked() && IsTheClickedSlot())
+            bool createRightLink = false;
+            bool breakRightLink = false;
+
+            // [SLOT-ML-R-01] & [SLOT-ML-R-04]: Create right link (LL or DL explicit)
+            if ((IsLeftLinked() || IsADoubleLinkedClickedSlot()) && IsTheClickedSlot())
             {
+                createRightLink = true;
+            }
+            // [SLOT-ML-R-02] & [SLOT-ML-R-03]: Break right link (UL, NS, or RL explicit)
+            else if (IsUnlinked() || IsNonSlot() || (IsRightLinked() && IsTheClickedSlot()))
+            {
+                breakRightLink = true;
+            }
+
+            // Apply Logic
+            if (createRightLink)
+            {
+                // [SLOT-NAT-R-02]: Assign RL to RS(1)
                 if (!RightSlot.IsRightLinked())
-                    RightSlot.SetInSlot(MateriaSlot.EmptyRightLinkedSlot, lastSelectionType, UpdateDirection.Right);
-
+                {
+                    RightSlot.SetInSlot(MateriaSlot.NormalRightLinkedSlot, lastSelectionType, UpdateDirection.Right);
+                }
             }
-
-            else if (IsRightLinked() && IsADoubleLinkedClickedSlot())
+            else if (breakRightLink)
             {
-                if (!RightSlot.IsRightLinked())
-                    RightSlot.SetInSlot(MateriaSlot.EmptyRightLinkedSlot, lastSelectionType, UpdateDirection.Right);
+                // [SLOT-NAT-R-01]: Check if RS(1) is linked
+                if (RightSlot.IsRightLinked())
+                {
+                    // [SLOT-ML-R-02] Condition 2: Save chain if RS(2) is RL
+                    if (RightSlot.RightSlot.IsRightLinked())
+                    {
+                        RightSlot.SetInSlot(MateriaSlot.NormalLeftLinkedSlot, lastSelectionType, UpdateDirection.Right);
+                    }
+                    else
+                    {
+                        RightSlot.SetInSlot(MateriaSlot.NormalUnlinkedSlot, lastSelectionType, UpdateDirection.Right);
+                    }
+                }
             }
-
-            else if (IsRightLinked() && IsTheClickedSlot()) 
-            {
-                    if (RightSlot.IsRightLinked() && RightSlot.RightSlot.IsRightLinked())
-                        RightSlot.SetInSlot(MateriaSlot.EmptyLeftLinkedSlot, lastSelectionType, UpdateDirection.Right);
-            }
-
-            else if (IsUnlinked() || IsNonSlot())
-            {
-                if (RightSlot.IsRightLinked() && RightSlot.RightSlot.IsRightLinked())
-                    RightSlot.SetInSlot(MateriaSlot.EmptyLeftLinkedSlot, lastSelectionType, UpdateDirection.Right);
-                else
-                    RightSlot.SetInSlot(MateriaSlot.EmptyUnlinkedSlot, lastSelectionType, UpdateDirection.Right);
-            }
-
         }
 
         private bool IsADoubleLinkedClickedSlot()
@@ -232,21 +237,17 @@ namespace FF7Scarlet.Shared.Models
             return SlotIndex == lastSelectionType.SlotIndex;
         }
 
-
         public bool IsDoubleLinked(MateriaSlot? newMateriaSlot = null)
         {
-            bool isDoubleLinked = false;
-            if (isMultilinkedEnabled)
-            {
-                bool isDoubleLinkedClicked = IsADoubleLinkedClickedSlot();
+            if (!isMultilinkedEnabled) return false;
 
-                bool isRightLinkedChain = IsRightLinked() && RightSlot.IsRightLinked();
-                bool isLeftConnected = LeftSlot.IsLeftLinked() || LeftSlot.IsRightLinked();
-                bool isMiddleOfChain = isRightLinkedChain && isLeftConnected;
+            bool isDoubleLinkedClicked = IsADoubleLinkedClickedSlot();
 
-                isDoubleLinked = isDoubleLinkedClicked || isMiddleOfChain;
-            }
+            bool isRightLinkedChain = IsRightLinked() && RightSlot.IsRightLinked();
+            bool isLeftConnected = LeftSlot.IsLeftLinked() || LeftSlot.IsRightLinked();
+            bool isMiddleOfChain = isRightLinkedChain && isLeftConnected;
 
+            bool isDoubleLinked = isDoubleLinkedClicked || isMiddleOfChain;
             return isDoubleLinked;
         }
 
