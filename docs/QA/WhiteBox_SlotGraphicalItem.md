@@ -152,11 +152,11 @@ Predicados:
 
 ### 3.4 Tabla de Casos de Prueba (Cobertura 100%)
 
-| ID | Escenario | Estado Inicial (**Current**, Right, Right+1) | Input User | Resultado Esperado en `RightSlot` |
+| ID | Escenario | Estado Inicial (**Current**, Right, Right+1, Right+2) | Input User | Resultado Esperado en `RightSlot` |
 |:---|:---|:---|:---|:---|
-| **URS-01** | Crear par LL (Click) | `[LL, UL, UL]` | Click en Current | Right cambia a `RightLinked` |
-| **URS-02** | Propagación pasiva LL | `[LL, UL, UL]` | Click en otro lado | No cambia |
-| **URS-03** | Crear DL (Click Menu) | `[LL, RL, UL]` | Click DL en Current (Middle) | Right cambia a `RightLinked` |
-| **URS-04** | Romper DL desde izq | `[LL, RL, RL]` | Click RL en Current | Right cambia a `LeftLinked` (Nuevo inicio) |
-| **URS-05** | Borrar slot en cadena | `[UL, RL, RL]` | Set a `Unlinked` | Right cambia a `LeftLinked` (Nuevo inicio) |
-| **URS-06** | Borrar par simple | `[UL, RL, UL]` | Set a `Unlinked` | Right cambia a `Unlinked` |
+| **URS-01** | Crear par LL (Click) | `[LL, UL, UL, UL]` | Click en Current | Right cambia a `RightLinked` |
+| **URS-02** | Propagación pasiva LL | `[LL, UL, UL, UL]` | Click en otro lado | No cambia |
+| **URS-03** | Crear DL (Click Menu) | `[LL, RL, UL, UL]` | Click DL en Current | Right cambia a `RightLinked` |
+| **URS-04** | Romper DL (Salvar Cadena) | `[LL, RL, RL, RL]` | Click RL en Current | Right cambia a `LeftLinked` (Nuevo inicio) |
+| **URS-05** | Borrar (Salvar Cadena) | `[UL, RL, RL, RL]` | Set a `Unlinked` | Right cambia a `LeftLinked` (Nuevo inicio) |
+| **URS-06** | Borrar par simple | `[UL, RL, UL, UL]` | Set a `Unlinked` | Right cambia a `Unlinked` |

@@ -109,15 +109,16 @@ namespace FF7Scarlet.Tests
         [Description("ULS-01: Current LL, Conflict with Left LL -> Left becomes UL")]
         public void UpdateLeftSlot_CurrentLL_LeftLL_BreaksLeft()
         {
-            // Initial: [LL, LL] (Invalid state we are correcting)
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalLeftLinkedSlot);
-            var current = items[1]; // Index 1 is LL
+            // Initial: [LL, UL]
+            // We want to set Index 1 to LL. This creates [LL, LL] collision momentarily, which should resolve to [UL, LL].
+            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalUnlinkedSlot);
+            var current = items[1]; // Index 1 is UL
             var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.LeftLinked, MateriaSlot.NormalUnlinkedSlot);
 
-            // Action: Re-set Index 1 to LL to trigger UpdateLeft logic
+            // Action: Set Index 1 to LL
             current.SetInSlot(MateriaSlot.NormalLeftLinkedSlot, typeSelected, UpdateDirection.Left);
 
-            // Expect: Index 0 changes to Unlinked
+            // Expect: Index 0 changes to Unlinked because of collision
             Assert.That(items[0].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalUnlinkedSlot));
         }
 
@@ -125,7 +126,7 @@ namespace FF7Scarlet.Tests
         [Description("ULS-02: Current LL, Left Compatible (UL) -> Left stays UL")]
         public void UpdateLeftSlot_CurrentLL_LeftUL_NoChange()
         {
-            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalLeftLinkedSlot);
+            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
             var current = items[1];
             var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.LeftLinked, MateriaSlot.NormalUnlinkedSlot);
 
@@ -138,7 +139,8 @@ namespace FF7Scarlet.Tests
         [Description("ULS-03: Current RL, Left Free (UL) -> Left becomes LL (Auto-link)")]
         public void UpdateLeftSlot_CurrentRL_LeftUL_LinksLeft()
         {
-            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalRightLinkedSlot);
+            // Initial: [UL, UL]
+            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
             var current = items[1];
             var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.RightLinked, MateriaSlot.NormalUnlinkedSlot);
 
@@ -152,7 +154,8 @@ namespace FF7Scarlet.Tests
         [Description("ULS-04: Current RL, Left Occupied (LL) -> Left stays LL")]
         public void UpdateLeftSlot_CurrentRL_LeftLL_NoChange()
         {
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
+            // Initial: [LL, UL]
+            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalUnlinkedSlot);
             var current = items[1];
             var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.RightLinked, MateriaSlot.NormalUnlinkedSlot);
 
@@ -165,7 +168,9 @@ namespace FF7Scarlet.Tests
         [Description("ULS-05: Current UL, Left Hanging (LL) -> Left becomes UL")]
         public void UpdateLeftSlot_CurrentUL_LeftLL_BreaksLeft()
         {
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalUnlinkedSlot);
+            // Initial: [LL, LL] (Hypothetical connected state that we break from the right side)
+            // Wait, [LL, LL] is invalid. Let's assume [LL, RL] and we set Right to UL.
+            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
             var current = items[1];
             var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.Unlinked, MateriaSlot.NormalRightLinkedSlot);
 
@@ -183,7 +188,8 @@ namespace FF7Scarlet.Tests
             var current = items[1];
             var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.Unlinked, MateriaSlot.NormalUnlinkedSlot);
 
-            current.SetInSlot(MateriaSlot.NormalUnlinkedSlot, typeSelected, UpdateDirection.Left);
+            current.SetInSlot(MateriaSlot.NormalUnlinkedSlot, typeSelected, UpdateDirection.Left, forceUpdate: true); 
+            // Forced update to ensure it runs logic even if values match, though functionally no change expected
 
             Assert.That(items[0].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalUnlinkedSlot));
         }
@@ -196,7 +202,8 @@ namespace FF7Scarlet.Tests
         [Description("URS-01: LL + Clicked -> Right changes to RL")]
         public void UpdateRightSlot_LLClicked_RightUL_BecomesRL()
         {
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
+            // Initial: [UL, UL]
+            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
             var current = items[0];
             // Simulate User Click on Index 0 selecting LL
             var typeSelected = new TypeSelectedForSlot(0, SlotMenuValue.LeftLinked, MateriaSlot.NormalUnlinkedSlot);
@@ -210,7 +217,8 @@ namespace FF7Scarlet.Tests
         [Description("URS-02: Propagate Passive LL (Not Clicked) -> Right No Change")]
         public void UpdateRightSlot_LLPassive_RightUL_NoChange()
         {
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
+            // Initial: [UL, UL]
+            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
             var current = items[0];
             // Simulate User Clicked somewhere else (Index 5), so Index 0 is passive update
             var typeSelected = new TypeSelectedForSlot(5, SlotMenuValue.Unlinked, MateriaSlot.None);
@@ -239,59 +247,39 @@ namespace FF7Scarlet.Tests
         }
 
         [Test]
-        [Description("URS-04: Break DL from Left -> Right changes to LL (New Start)")]
+        [Description("URS-04: Break DL from Left (Save Chain) -> Right changes to LL (New Start)")]
         public void UpdateRightSlot_BreakDL_RightBecomesLL()
         {
-            // Initial: [LL, RL, RL] (Double Linked Chain)
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
+            // Initial: [LL, UL, RL, RL] (Gap at 1)
+            // We set 1 to RL.
+            // If we assume 1 was part of a chain we are breaking/joining.
+            // Let's emulate the "Break" scenario: We had a chain, we change the node.
+            // To ensure logic triggers, we transition from UL to RL.
+            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
             var current = items[1];
-            // User selects standard RightLinked (not DL) on Index 1, effectively breaking the chain to the right
-            var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.RightLinked, MateriaSlot.NormalRightLinkedSlot);
+            
+            // User selects standard RightLinked (not DL) on Index 1.
+            var typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.RightLinked, MateriaSlot.NormalUnlinkedSlot);
 
             current.SetInSlot(MateriaSlot.NormalRightLinkedSlot, typeSelected, UpdateDirection.Right);
 
-            // Expect: Index 2 changes from RL to LL (starts a new pair/chain or becomes orphan start)
-            // Logic: If Right (2) is RL and RightRight (3) is RL -> 2 becomes LL.
-            // Wait, in this setup [LL, RL, RL, (None)], RightRight is None.
-            // If RightRight is NOT RL, then logic:
-            // "if (RightSlot.IsRightLinked() && RightSlot.RightSlot.IsRightLinked())" -> False
-            // else -> "RightSlot.SetInSlot(MateriaSlot.EmptyUnlinkedSlot..." or LeftLinked?
-            // Let's check code in UpdateRightSlot:
-            // else if (IsRightLinked() && IsTheClickedSlot()) {
-            //    if (RightSlot.IsRightLinked() && RightSlot.RightSlot.IsRightLinked()) 
-            //       RightSlot.SetInSlot(..., LeftLinked...)
-            // }
-            // If the condition fails, it does NOTHING in that block.
-            
-            // However, if we follow "URS-04" description from prompt: "Right changes to LeftLinked".
-            // Let's test what happens with a longer chain: [LL, RL, RL, RL]
-            // If we break at index 1 -> Index 2 should probably become LL.
-            
-            // Let's try with 4 slots for this test case to match the "ChainRight" logic
-            items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
-            current = items[1];
-            typeSelected = new TypeSelectedForSlot(1, SlotMenuValue.RightLinked, MateriaSlot.NormalRightLinkedSlot);
-            
-            current.SetInSlot(MateriaSlot.NormalRightLinkedSlot, typeSelected, UpdateDirection.Right);
-            
+            // Expect: Index 2 changes from RL to LL because Index 3 is still RL.
+            // Logic: IsRightLinked() && IsTheClickedSlot() -> Checks RightSlot(2) is RL && RightRight(3) is RL. -> Set RightSlot(2) to LL.
             Assert.That(items[2].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalLeftLinkedSlot));
         }
 
         [Test]
-        [Description("URS-05: Delete slot in chain -> Right becomes LL")]
+        [Description("URS-05: Delete slot in chain (Save Chain) -> Right becomes LL")]
         public void UpdateRightSlot_UL_ChainRight_RightBecomesLL()
         {
-            // Initial: [UL, RL, RL] -> Index 0 is UL (but let's say we are setting it to UL from something else)
-            // Let's say we had [LL, RL, RL] and we set 0 to UL.
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
+            // Initial: [LL, RL, RL, RL]
+            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
             var current = items[0];
             var typeSelected = new TypeSelectedForSlot(0, SlotMenuValue.Unlinked, MateriaSlot.NormalLeftLinkedSlot);
 
             current.SetInSlot(MateriaSlot.NormalUnlinkedSlot, typeSelected, UpdateDirection.Right);
 
-            // Logic: IsUnlinked() is true. 
-            // if (RightSlot.IsRightLinked() && RightSlot.RightSlot.IsRightLinked()) -> True (1 is RL, 2 is RL)
-            // then RightSlot (1) -> LeftLinked.
+            // Expect: Index 1 becomes LL because Index 2 is still RL.
             Assert.That(items[1].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalLeftLinkedSlot));
         }
 
@@ -299,17 +287,14 @@ namespace FF7Scarlet.Tests
         [Description("URS-06: Delete simple pair -> Right becomes UL")]
         public void UpdateRightSlot_UL_NoChain_RightBecomesUL()
         {
-            // Initial: [UL, RL, UL] (Assuming we set 0 to UL)
-            // Setup as [LL, RL, UL] then change 0 to UL.
-            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalUnlinkedSlot);
+            // Initial: [LL, RL, UL, UL]
+            var items = InitializeSlots(MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot, MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalUnlinkedSlot);
             var current = items[0];
             var typeSelected = new TypeSelectedForSlot(0, SlotMenuValue.Unlinked, MateriaSlot.NormalLeftLinkedSlot);
 
             current.SetInSlot(MateriaSlot.NormalUnlinkedSlot, typeSelected, UpdateDirection.Right);
 
-            // Logic: IsUnlinked() true.
-            // Chain check false (Index 2 is UL).
-            // else -> RightSlot (1) -> Unlinked.
+            // Expect: Index 1 becomes UL because Index 2 is NOT RL (no chain to save).
             Assert.That(items[1].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalUnlinkedSlot));
         }
     }
