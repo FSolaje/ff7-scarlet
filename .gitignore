@@ -376,3 +376,6 @@ FodyWeavers.xsd
 
 ### Gemini CLI
 .gemini-settings.md
+
+# Local utility scripts
+scripts/
