@@ -262,13 +262,6 @@ namespace FF7Scarlet.Shared.Controls
             var slotGraphical = graphicalSlots[slot];
             bool result = slotGraphical.SetInSlot(value, slotClickedInSelectorType, UpdateDirection.Both);
 
-			// TODO Delete this Debug block when UpdateSlotPictureBos was resolved
-            Debug.WriteLine("----------");
-            graphicalSlots.ForEach(slot => Debug.WriteLine(
-                "["+slot.SlotIndex+"] " + slot.MateriaSlotValue + " DL: " + slot.IsDoubleLinked()
-                )
-            );
-
             graphicalSlots.ForEach(graphicalSlot => UpdateSlotPictureBox(graphicalSlot.SlotIndex));
             graphicalSlots.ForEach(graphicalSlot => UpdateSlotSelectorType(graphicalSlot.SlotIndex));
             InvokeDataChanged(this, EventArgs.Empty);

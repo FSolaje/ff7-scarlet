@@ -32,37 +32,39 @@ namespace FF7Scarlet.Tests
         [TestCase(MateriaSlot.EmptyRightLinkedSlot, false, MateriaSlotResource.materia_slot6)]
         [TestCase(MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_dl1)]
         [TestCase(MateriaSlot.EmptyRightLinkedSlot, true, MateriaSlotResource.materia_slot_dl2)]
-        public void GetSlotResourceForEmptyTest(MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
+        public void GetSlotResource_Empty_MatchesState(MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
         {
-            var actualResource = SlotImage.GetSlotResourceForEmpty(materiaSlot, isDoubleLinked);
+            var actualResource = SlotImage.GetSlotResource(MateriaTypeExtended.None, materiaSlot, isDoubleLinked);
             Assert.That(actualResource, Is.EqualTo(expected));
         }
 
         [Test]
-        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot_command1)]
-        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_command2)]
-        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_command3)]
-        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_command_dl)]
-        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot_magic1)]
-        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_magic2)]
-        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_magic3)]
-        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_magic_dl)]
-        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot_summon1)]
-        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_summon2)]
-        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_summon3)]
-        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_summon_dl)]
-        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot_support1)]
-        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_support2)]
-        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_support3)]
-        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_support_dl)]
+        [TestCase(MateriaTypeExtended.Command, MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot_command1, Description = "[SIMAGE-MAT-UL]")]
+        [TestCase(MateriaTypeExtended.Command, MateriaSlot.EmptyUnlinkedSlot, false, MateriaSlotResource.materia_slot_command1, Description = "TV-06: Empty UL with materia")]
+        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_magic2, Description = "[SIMAGE-MAT-LL]")]
+        [TestCase(MateriaTypeExtended.Magic, MateriaSlot.EmptyLeftLinkedSlot, false, MateriaSlotResource.materia_slot_magic2, Description = "Empty LL with materia")]
+        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_summon3, Description = "[SIMAGE-MAT-RL]")]
+        [TestCase(MateriaTypeExtended.Summon, MateriaSlot.EmptyRightLinkedSlot, false, MateriaSlotResource.materia_slot_summon3, Description = "Empty RL with materia")]
+        [TestCase(MateriaTypeExtended.Support, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_support_dl, Description = "[SIMAGE-MAT-DL]")]
+        [TestCase(MateriaTypeExtended.Support, MateriaSlot.EmptyRightLinkedSlot, true, MateriaSlotResource.materia_slot_support_dl, Description = "TV-08: Empty DL with materia")]
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalUnlinkedSlot, false, MateriaSlotResource.materia_slot_independent1)]
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalLeftLinkedSlot, false, MateriaSlotResource.materia_slot_independent2)]
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalRightLinkedSlot, false, MateriaSlotResource.materia_slot_independent3)]
         [TestCase(MateriaTypeExtended.Independent, MateriaSlot.NormalRightLinkedSlot, true, MateriaSlotResource.materia_slot_independent_dl)]
-        public void GetSlotResourceForEquippedMateriaTest(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
+        public void GetSlotResource_WithMateria_MatchesState(MateriaTypeExtended materiaType, MateriaSlot materiaSlot, bool isDoubleLinked, MateriaSlotResource expected)
         {
-            var actualResource = SlotImage.GetSlotResourceForEquippedMateria(materiaType, materiaSlot, isDoubleLinked);
+            var actualResource = SlotImage.GetSlotResource(materiaType, materiaSlot, isDoubleLinked);
             Assert.That(actualResource, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void EnumValues_FollowNamingConvention()
+        {
+            var values = Enum.GetNames(typeof(MateriaSlotResource));
+            foreach (var name in values)
+            {
+                Assert.That(name, Does.StartWith("materia_slot"), $"Enum value '{name}' must start with 'materia_slot'");
+            }
         }
     }
 }
