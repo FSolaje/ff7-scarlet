@@ -18,12 +18,18 @@ namespace FF7Scarlet.Tests
             SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal, true);
         }
 
-        private List<SlotGraphicalItem> InitializeSlots(params MateriaSlot[] specificSlots)
+        private List<SlotGraphicalItem> InitializeSlots(MateriaSlot[] specificSlots, GrowthRate growthRate = GrowthRate.Normal)
         {
             var slots = new MateriaSlot[SLOT_COUNT];
             Array.Fill(slots, MateriaSlot.None);
             Array.Copy(specificSlots, slots, Math.Min(specificSlots.Length, SLOT_COUNT));
-            return SlotGraphicalItem.CreateSlots(slots, GrowthRate.Normal, true);
+            return SlotGraphicalItem.CreateSlots(slots, growthRate, true);
+        }
+
+        // Overload for cleaner syntax in existing tests
+        private List<SlotGraphicalItem> InitializeSlots(params MateriaSlot[] specificSlots)
+        {
+            return InitializeSlots(specificSlots, GrowthRate.Normal);
         }
 
         // ========================================================================
@@ -296,6 +302,57 @@ namespace FF7Scarlet.Tests
 
             // Expect: Index 1 becomes UL because Index 2 is NOT RL (no chain to save).
             Assert.That(items[1].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalUnlinkedSlot));
+        }
+
+        // ========================================================================
+        // 4. Growth Rate Tests (TG)
+        // ========================================================================
+
+        [Test]
+        [Description("TG-01: Normal -> None (Empty) converts Normal slots to Empty")]
+        public void UpdateGrowthRate_NormalToEmpty_ConvertsSlots()
+        {
+            // Initial: Growth Normal, [UL, LL, RL]
+            var items = InitializeSlots(MateriaSlot.NormalUnlinkedSlot, MateriaSlot.NormalLeftLinkedSlot, MateriaSlot.NormalRightLinkedSlot);
+            
+            // Act: Change Growth to None and refresh
+            SlotGraphicalItem.SetGrowthRate(GrowthRate.None);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(items[0].MateriaSlotValue, Is.EqualTo(MateriaSlot.EmptyUnlinkedSlot), "Index 0 should be EmptyUnlinked");
+                Assert.That(items[1].MateriaSlotValue, Is.EqualTo(MateriaSlot.EmptyLeftLinkedSlot), "Index 1 should be EmptyLeftLinked");
+                Assert.That(items[2].MateriaSlotValue, Is.EqualTo(MateriaSlot.EmptyRightLinkedSlot), "Index 2 should be EmptyRightLinked");
+            });
+        }
+
+        [Test]
+        [Description("TG-02: None (Empty) -> Normal converts Empty slots to Normal")]
+        public void UpdateGrowthRate_EmptyToNormal_ConvertsSlots()
+        {
+            // Initial: Growth None
+            var items = InitializeSlots(new MateriaSlot[] { MateriaSlot.EmptyUnlinkedSlot }, GrowthRate.None);
+
+            // Verify initial state
+            Assert.That(items[0].MateriaSlotValue, Is.EqualTo(MateriaSlot.EmptyUnlinkedSlot));
+
+            // Act: Change Growth to Normal
+            SlotGraphicalItem.SetGrowthRate(GrowthRate.Normal);
+
+            // Assert
+            Assert.That(items[0].MateriaSlotValue, Is.EqualTo(MateriaSlot.NormalUnlinkedSlot));
+        }
+
+        [Test]
+        [Description("TG-04: Normal -> None does NOT affect None slots")]
+        public void UpdateGrowthRate_NoneSlots_RemainNone()
+        {
+            var items = InitializeSlots(MateriaSlot.None);
+            
+            SlotGraphicalItem.SetGrowthRate(GrowthRate.None);
+
+            Assert.That(items[0].MateriaSlotValue, Is.EqualTo(MateriaSlot.None));
         }
     }
 }
