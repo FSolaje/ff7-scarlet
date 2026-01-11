@@ -102,14 +102,9 @@ namespace FF7Scarlet.Shared.Controls
                 bool newIsNone = value == GrowthRate.None;
 
                 // Execute loop only if the 'None' state changes
-                if (oldIsNone != newIsNone)
-                {
-                    SlotGraphicalItem.GrowthRate = value;
-                    for (int i = 0; i < SLOT_COUNT; ++i)
-                    {
-                        graphicalSlots[i].SetInSlot(graphicalSlots[i].MateriaSlotValue, slotClickedInSelectorType, UpdateDirection.Both, true);
-                    }
-                }
+                SlotGraphicalItem.SetGrowthRate(value);
+                graphicalSlots.ForEach(s => UpdateSlotPictureBox(s.SlotIndex));
+                
                 growthRate = value;
                 InvokeDataChanged(this, EventArgs.Empty);
             }

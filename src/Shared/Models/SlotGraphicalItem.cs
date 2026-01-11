@@ -50,6 +50,18 @@ namespace FF7Scarlet.Shared.Models
             return AllSlots;
         }
 
+        public static void SetGrowthRate(GrowthRate newRate)
+        {
+            if (GrowthRate != newRate)
+            {
+                GrowthRate = newRate;
+                foreach (var slot in AllSlots)
+                {
+                    slot.SetInSlot(slot.MateriaSlotValue, lastSelectionType, UpdateDirection.Both, forceUpdate: true);
+                }
+            }
+        }
+
         public MateriaSlot MateriaSlotValue
         {
             get

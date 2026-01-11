@@ -68,3 +68,15 @@ Permite cadenas complejas y el estado DL.
     *   Acción: Si LS(1) es LL -> Asignar **UL** a LS(1).
 *   **[SLOT-ML-L-02]**: Asignar RL crea enlace izquierdo (Auto-link).
     *   Acción: Si LS(1) es UL o NS -> Asignar **LL** a LS(1).
+
+---
+
+## 3. Reglas de Cambio de Crecimiento (Growth Rate)
+
+El sistema debe reaccionar ante cambios globales en la tasa de crecimiento del equipo.
+
+*   **[SLOT-GROWTH-01]**: Conversión de Variante.
+    *   Si el nuevo crecimiento es **None** (Empty): Todos los slots `Normal*` deben convertirse a su equivalente `Empty*`.
+    *   Si el nuevo crecimiento es **Normal/Double/Triple**: Todos los slots `Empty*` deben convertirse a su equivalente `Normal*`.
+    *   Los slots `None` (NS) no se ven afectados.
+    *   La lógica de enlace (UL, LL, RL) se mantiene intacta, solo cambia la variante de crecimiento.

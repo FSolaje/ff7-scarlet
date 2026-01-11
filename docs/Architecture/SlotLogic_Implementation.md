@@ -22,6 +22,7 @@ El sistema utiliza propiedades estáticas para mantener la coherencia durante la
 
 *   `isMultilinkedEnabled`: Bandera maestra que habilita/deshabilita la lógica extendida (2.2 del algoritmo).
 *   `lastSelectionType`: Estructura (`TypeSelectedForSlot`) que almacena la intención original del usuario. Es crítica para diferenciar entre "Asignar RL (Rotura)" y "Asignar RL (DoubleLinked)".
+*   `GrowthRate`: Propiedad estática que define el crecimiento actual del equipo (ver sección 5).
 
 ---
 
@@ -94,3 +95,12 @@ La implementación no separa explícitamente el código en bloques "Nativo" vs "
     *   La capacidad de `IsRightLinked()` de encadenar verificaciones hacia `RightSlot.RightSlot`.
 
 Si Multilink está desactivado (`isMultilinkedEnabled = false`), `IsDoubleLinked()` siempre retorna `false`, y las opciones de menú DL no aparecen, forzando al sistema a comportarse como Nativo (pares simples LL-RL).
+
+---
+
+## 5. Gestión de Crecimiento (`GrowthRate`)
+
+La implementación de la regla **[SLOT-GROWTH-01]** se realiza mediante el método estático `SetGrowthRate`.
+
+*   **Mecanismo**: Al cambiar el crecimiento global, se itera sobre todos los slots activos.
+*   **Conversión**: Se invoca `SetInSlot(..., forceUpdate: true)`. Esto fuerza una llamada interna a `GetMatchingSlot()`, que recalcula la variante del slot (Normal vs Empty) basándose en el nuevo `GrowthRate`, manteniendo el estado de enlace intacto.
