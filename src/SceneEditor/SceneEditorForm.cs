@@ -7,8 +7,6 @@ using Shojy.FF7.Elena.Attacks;
 using Shojy.FF7.Elena.Battle;
 using Shojy.FF7.Elena.Inventory;
 
-using System.Globalization;
-using System.Media;
 using System.Xml.Linq;
 namespace FF7Scarlet.SceneEditor
 {
