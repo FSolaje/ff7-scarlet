@@ -91,24 +91,17 @@ namespace FF7Scarlet.Shared.Models
         public MateriaSlotResource GetMatchingResource(Materia? equipped = null)
         {
             bool isDoubleLinkedSlot = IsDoubleLinked();
+            MateriaTypeExtended materiaTypeExtended = MateriaTypeExtended.None;
+            MateriaSlot slotToUse = MateriaSlotValue;
 
             if (equipped != null)
             {
-                var fixedSlot = GetMatchingSlot();
+                slotToUse = GetMatchingSlot();
                 var materiaType = Materia.GetMateriaType(equipped.MateriaTypeByte);
-                var materiaTypeExtended = materiaType.ToExtendedMateriaType();
-
-                if (materiaTypeExtended == MateriaTypeExtended.None)
-                {
-                    return SlotImage.GetSlotResourceForEmpty(MateriaSlotValue, isDoubleLinkedSlot);
-                }
-
-                return SlotImage.GetSlotResourceForEquippedMateria(materiaTypeExtended, fixedSlot, isDoubleLinkedSlot);
+                materiaTypeExtended = materiaType.ToExtendedMateriaType();
             }
-            else
-            {
-                return SlotImage.GetSlotResourceForEmpty(MateriaSlotValue, isDoubleLinkedSlot);
-            }
+
+            return SlotImage.GetSlotResource(materiaTypeExtended, slotToUse, isDoubleLinkedSlot);
         }
 
         public Image GetMatchingImage(Materia? equipped = null)
